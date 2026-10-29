@@ -1,0 +1,186 @@
+
+.saves-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #f0f7f4; 
+}
+
+
+.saves-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #cddc39; 
+  padding-bottom: 1rem;
+}
+
+.saves-header h1 {
+  color: #f0f7f4; 
+  margin: 0;
+  font-size: clamp(1.4rem, 1rem + 2vw, 2rem);
+}
+
+.btn-back {
+  color: #cddc39; 
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid #cddc39;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.btn-back:hover {
+  background-color: #cddc39;
+  color: #1e392a; 
+}
+
+
+.saves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 20px;
+}
+
+
+.save-card {
+  background-color: #f0f7f4; 
+  color: #1e392a; 
+  border: 2px solid #cddc39; 
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.save-card:hover {
+  transform: translateY(-5px);
+  border-color: #38a169; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 1rem;
+}
+
+.mini-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.save-info h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1e392a;
+  font-weight: 800;
+}
+
+.team-name {
+  margin: 5px 0 0 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+
+.card-dates {
+  background-color: rgba(205, 220, 57, 0.2); 
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.card-dates p {
+  margin: 3px 0;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+
+.btn-continue {
+  width: 100%;
+  padding: 12px;
+  background-color: #38a169; 
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+.btn-continue:hover {
+  background-color: #2f855a; 
+}
+
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #ccc;
+}
+
+.btn-new {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 10px 20px;
+  background-color: #cddc39;
+  color: #1e392a;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+
+.btn-delete {
+  width: 100%;
+  margin-top: 10px;
+  padding: 0.7rem;
+  background: rgba(255, 80, 80, 0.15); 
+  border-left: 5px solid #ff5252;
+  color: #ff8a80;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  background: #ff5252;
+  color: #15291f;
+  border-left: 10px solid #ff8a80;
+  transform: translateX(5px);
+}
+
+@media (max-width: 600px) {
+  .saves-container {
+    padding: 1.25rem 1rem;
+  }
+
+  .saves-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-back {
+    width: 100%;
+    text-align: center;
+  }
+}

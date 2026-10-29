@@ -1,0 +1,80 @@
+<div class="simulacion-container">
+  <div class="toolbar">
+    <button class="btn-volver" (click)="navigateToMenuInicio(teamId)" [disabled]="!isFinished()">
+      <span class="arrow">&larr;</span> 
+      @if (isFinished()) { VOLVER AL MENÚ } @else { JUGANDO... }
+    </button>
+  </div>
+
+  <div class="live-scoreboard">
+    
+    <div class="timer-box">
+      @if (!isFinished()) {
+        <div class="live-dot"></div> VIVO
+      } @else {
+        FINAL
+      }
+      <span>{{ currentMinute() }}'</span>
+    </div>
+
+    <div class="team-box">
+      <span class="team-name">{{ homeTeam?.name }}</span>
+    </div>
+
+    <div class="score-display">
+      <span>{{ score().home }}</span>
+      <span>-</span>
+      <span>{{ score().away }}</span>
+    </div>
+
+    <div class="team-box">
+      <span class="team-name">{{ awayTeam?.name }}</span>
+    </div>
+
+  </div>
+
+  <div class="match-log-container">
+    
+    @for (e of events().slice().reverse(); track (events().length - 1 - $index)) {
+      
+      <div class="event-row" 
+           [class.goal]="e.type === 'goal'"
+           [class.yellow-card]="e.type === 'yellow'"
+           [class.red-card]="e.type === 'red'">
+        
+        <div class="event-time">{{ e.minute }}'</div>
+        
+        <div class="event-icon">
+          @switch (e.type) {
+            @case ('assist') { 👟⚽ }
+            @case ('goal') { ⚽ }
+            @case ('yellow') { 🟨 }
+            @case ('red') { 🟥 }
+            @default { 🔹 }
+          }
+        </div>
+
+        <div class="event-text">
+          @if (e.type === 'goal') {
+            <strong>¡GOOOL!</strong> de {{ getPlayerName(getTeamById(e.teamId), e.playerId) }}
+             ({{ getTeamById(e.teamId)?.shortName }})@if (e.assistId) {
+                <span class="asist"> ( 👟⚽ {{ getPlayerName(getTeamById(e.teamId), e.assistId) }})</span>
+              }
+          } 
+          @else if (e.type === 'yellow') {
+            Tarjeta Amarilla para {{ getPlayerName(getTeamById(e.teamId), e.playerId) }}
+          }
+          @else if (e.type === 'red') {
+            <strong>¡EXPULSADO!</strong> {{ getPlayerName(getTeamById(e.teamId), e.playerId) }} deja la cancha.
+          }
+          @else {
+            {{ e.type }} - {{ getPlayerName(getTeamById(e.teamId), e.playerId) }}
+          }
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+</div>

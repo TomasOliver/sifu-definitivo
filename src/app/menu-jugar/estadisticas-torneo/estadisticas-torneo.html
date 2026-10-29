@@ -1,0 +1,82 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]">Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]" class="active">Estadísticas Torneo</a>
+  </div>
+
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+</div>
+
+<div class="torneo-container">
+
+  <h2 class="titulo">Estadísticas del Torneo</h2>
+
+  <div class="torneo-grid">
+
+
+    <div class="stat-card">
+      <h3 class="card-title">Goleadores</h3>
+      <div class="list">
+        @for (p of topGoals(); track p.id) {
+          <p class="list-item">
+            <span>{{ p.name }}</span>
+            <span class="value">{{ p.stats.goals }}</span>
+          </p>
+        }
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3 class="card-title">Asistencias</h3>
+      <div class="list">
+        @for (p of topAssists(); track p.id) {
+          <p class="list-item">
+            <span>{{ p.name }}</span>
+            <span class="value">{{ p.stats.assists }}</span>
+          </p>
+        }
+      </div>
+    </div>
+
+
+    <div class="stat-card">
+      <h3 class="card-title">Tarjetas Amarillas</h3>
+      <div class="list">
+        @for (p of topYellows(); track p.id) {
+          <p class="list-item">
+            <span>{{ p.name }}</span>
+            <span class="value yellow">{{ p.stats.yellowCards }}</span>
+          </p>
+        }
+      </div>
+    </div>
+
+
+    <div class="stat-card">
+      <h3 class="card-title">Tarjetas Rojas</h3>
+      <div class="list">
+        @for (p of topReds(); track p.id) {
+          <p class="list-item">
+            <span>{{ p.name }}</span>
+            <span class="value red">{{ p.stats.redCards }}</span>
+          </p>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

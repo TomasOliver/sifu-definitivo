@@ -1,0 +1,114 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId()]" class="active">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId()]">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId()]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId()]">Tabla</a>
+
+    <a [routerLink]="['/estadisticasEquipo', teamId()]">Estadísticas Equipo</a>
+
+    <a [routerLink]="['/estadisticasTorneo', teamId()]">Estadísticas Torneo</a>
+  </div>
+
+  <div class="nav-spacer"></div>
+
+  <button class="nav-btn logout-btn" (click)="logout()">
+    Cerrar Sesión
+  </button>
+</nav>
+
+<div class="dashboard-container">
+
+  <div class="content-wrapper">
+
+    <header class="dashboard-header">
+      <h1>Centro de Gestión</h1>
+      <p>Temporada 2024/2025</p>
+    </header>
+
+    <div class="game-menu">
+
+      @if (isSeasonFinished() && champion()) {
+
+      <div class="champion-box">
+        <h2>🏆 CAMPEÓN 🏆</h2>
+
+        <div class="champion-content">
+          <img [src]="getTeamLogo(champion()?.id!)" (error)="handleMissingImage($event)">
+          <h3>{{ champion()?.name }}</h3>
+        </div>
+      </div>
+
+      }
+      @else if (nextMatch() && nextMatchStandingInfo()) {
+
+      <div class="standings-box-container">
+
+        <div class="stand-box my-team">
+          <h3>Tu Equipo</h3>
+          <p class="team-name">{{ myTeamName() }}</p>
+
+          <div class="position-tag">
+            {{ nextMatchStandingInfo()?.myPos }}°
+            <span>posición</span>
+          </div>
+        </div>
+
+        <div class="stand-box rival-team">
+          <h3>Rival</h3>
+          <p class="team-name">{{ nextMatch()?.rivalTeamName }}</p>
+
+          <div class="position-tag">
+            {{ nextMatchStandingInfo()?.rivalPos }}°
+            <span>posición</span>
+          </div>
+        </div>
+
+      </div>
+
+      }
+
+
+
+      <div class="menu-option highlight" [class.disabled]="isSeasonFinished()"
+        (click)="!isSeasonFinished() && navigateToMenuSimulacion(teamId()!)">
+        <div class="option-content">
+          <h2>CONTINUAR</h2>
+
+          @if (nextMatch()) {
+          <span>
+            Jornada {{ nextMatch()?.matchday }} -
+            vs. {{ nextMatch()?.rivalTeamName }}
+            ({{ nextMatch()?.isHome ? 'Local' : 'Visitante' }})
+          </span>
+          }
+          @else {
+          <span>No hay próximos partidos</span>
+          }
+
+        </div>
+        <div class="icon">⚽</div>
+      </div>
+
+      <div class="menu-option auto-sim" (click)="simulateFullSeason()" [class.disabled]="isSeasonFinished()">
+        <div class="option-content">
+          <h2>SIMULAR TODA LA TEMPORADA</h2>
+          <span>Simula automáticamente todos los partidos restantes</span>
+        </div>
+        <div class="icon">⏩</div>
+      </div>
+
+
+      <div class="menu-option highlight" (click)="navigateToMenuPrincipal()">
+        <div class="option-content">
+          <h2>SALIR AL MENU PRINCIPAL </h2>
+          <span> </span>
+        </div>
+        <div class="icon">🔙</div>
+      </div>
+
+    </div>

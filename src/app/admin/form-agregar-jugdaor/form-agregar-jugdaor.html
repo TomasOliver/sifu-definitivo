@@ -1,0 +1,111 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()">
+    <fieldset class="form-admin">
+        @if(!this.esModoEdicion()){
+        <h1>Agregar Jugador:</h1>
+        }@else{
+        <h1>Editar Jugador:</h1>
+        }
+
+
+        <div class="form-field">
+            <label for="teamId">Equipo Del Jugador:</label>
+            <select id="teamId" formControlName="teamId">
+                <option value="" disabled>Seleccione un Equipo</option>
+                @for (equipo of equiposDisponibles; track equipo.id ){
+                <option [value]="equipo.id">{{equipo.name}}</option>
+                }
+            </select>
+
+            @if(teamId.dirty || teamId.touched){
+            @if(teamId.hasError('required')){
+            <span>Debe seleccionar un equipo</span>
+            }
+            }
+        </div>
+
+
+        <div class="form-field">
+            <label for="name">Nombre: </label>
+            <input type="text" id="name" formControlName="name">
+            @if(name.dirty || name.touched){
+            @if(name.hasError('required')){
+            <span>El nombre es requerido</span>
+            }
+            @if(name.hasError('minlength')){
+            <span>El nombre debe tener al menos 3 caracteres</span>
+            }
+            }
+        </div>
+
+
+        <div class="form-field">
+            <label for="position">Posicion: </label>
+            <select id="position" formControlName="position">
+                <option value="" disabled>Seleccione una Posición</option>
+                @for(posicion of tipoDePosiciones;track $index){
+                <option [value]="posicion">{{posicion}}</option>
+                }
+            </select>
+
+            @if(position.dirty || position.touched){
+            @if(position.hasError('required')){
+            <span>Debe seleccionar una posición</span>
+            }
+            }
+        </div>
+
+        <div class="form-field">
+            <label for="isStarter">Rol en el Equipo: </label>
+            <select id="isStarter" formControlName="isStarter">
+                <option [ngValue]="false">Suplente</option>
+                <option [ngValue]="true">Titular</option>
+            </select>
+        </div>
+
+
+        <div class="form-row">
+
+            <div class="form-field half-width">
+                <label for="rating">Rating Jugador: </label>
+                <input type="number" id="rating" formControlName="rating">
+
+                @if(rating.dirty || rating.touched){
+                @if(rating.hasError('required')){
+                <span>El rating es requerido</span>
+                }
+                @if(rating.hasError('min')){
+                <span>El rating mínimo es 1</span>
+                }
+                @if(rating.hasError('max')){
+                <span>El rating máximo es 99</span>
+                }
+                }
+            </div>
+
+
+            <div class="form-field half-width">
+                <label for="shirtNumber">Nro De Camiseta: </label>
+                <input type="number" id="shirtNumber" formControlName="shirtNumber">
+
+                @if(shirtNumber.dirty || shirtNumber.touched){
+                @if(shirtNumber.hasError('required')){
+                <span>El Nro de camiseta es requerido</span>
+                }
+                @if(shirtNumber.hasError('min')){
+                <span>El número mínimo es 1</span>
+                }
+                @if(shirtNumber.hasError('max')){
+                <span>El número máximo es 99</span>
+                }
+                }
+            </div>
+
+        </div>
+
+        <button type="submit">Enviar</button>
+        <button type="button" class="btn-back" (click)="goBack()">
+        Cancelar
+        </button>
+
+    </fieldset>
+</form>

@@ -1,0 +1,68 @@
+<form [formGroup]="form" (ngSubmit)="register()">
+
+  <h2>Registrarse</h2>
+
+  <div class="input-group">
+    <label for="reg-username" class="sr-only">Usuario</label>
+    <input 
+      id="reg-username" 
+      type="text" 
+      formControlName="username" 
+      placeholder="Usuario"
+    >
+  </div>
+
+  <div class="error-messages">
+    @if (form.get('username')?.invalid && (form.get('username')?.dirty || form.get('username')?.touched)) {
+      
+      @if (form.get('username')?.hasError('required')) {
+        <small>El nombre de usuario es requerido.</small>
+      }
+      @if (form.get('username')?.hasError('minlength')) {
+        <small>El usuario debe tener al menos 3 caracteres.</small>
+      }
+      @if (form.get('username')?.hasError('usuarioExistente')) {
+        <small><b>Error:</b> Este nombre de usuario ya existe.</small>
+      }
+    }
+  </div>
+
+  <div class="input-group">
+    <label for="reg-password" class="sr-only">Contraseña</label>
+    <input 
+      id="reg-password" 
+      type="password" 
+      formControlName="password" 
+      placeholder="Contraseña"
+    >
+  </div>
+
+  <div class="error-messages">
+    @if (form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)) {
+      
+      @if (form.get('password')?.hasError('required')) {
+        <small>La contraseña es requerida.</small>
+      }
+      @if (form.get('password')?.hasError('minlength')) {
+        <small>La contraseña debe tener al menos 6 caracteres.</small>
+      }
+      @if (form.get('password')?.hasError('pattern')) {
+        <small>La contraseña debe tener al menos un caracter especial (ej: #, ?, !, @, $).</small>
+      }
+    }
+  </div>
+
+  <div class="button-group">
+    <button type="submit" [disabled]="form.invalid || form.pending" class="btn-primary">
+      Crear cuenta
+    </button>
+    <button type="button" (click)="goToLogin()" class="btn-secondary">
+      Volver al Login
+    </button>
+  </div>
+
+  @if (msg) {
+    <p class="form-message">{{ msg }}</p>
+  }
+
+</form>

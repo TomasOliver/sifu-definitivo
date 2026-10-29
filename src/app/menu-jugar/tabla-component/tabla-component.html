@@ -1,0 +1,70 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]" class="active">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]" >Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
+  </div>
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+</div>
+
+<div class="container">
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabla de posiciones de la liga">
+  <table class="tabla-liga">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Equipo</th>
+        <th title="Puntos">PTS</th>
+        <th>PJ</th>
+        <th>G</th>
+        <th>E</th>
+        <th>P</th>
+        <th>GF</th>
+        <th>GC</th>
+        <th>DIF</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of sortedStandings(); track row.teamId; let i = $index) {
+
+      <tr>
+        <td>{{ i + 1 }}</td>
+
+        <td>
+          <img class="logo" [src]="getTeamLogo(row.teamId)" (error)="handleMissingImage($event)" alt="Escudo" />
+          {{ getTeamName(row.teamId) }}
+        </td>
+
+        <td>{{ row.points }}</td>
+        <td>{{ row.played }}</td>
+        <td>{{ row.wins }}</td>
+        <td>{{ row.draws }}</td>
+        <td>{{ row.losses }}</td>
+
+        <td>{{ row.goalsFor }}</td>
+        <td>{{ row.goalsAgainst }}</td>
+        <td>{{ row.goalsFor - row.goalsAgainst }}</td>
+      </tr>
+
+      } @empty {
+      <tr>
+        <td colspan="10">No hay datos aún.</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  </div>
+</div>

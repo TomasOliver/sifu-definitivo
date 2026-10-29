@@ -1,0 +1,234 @@
+.game-navbar {
+  background-color: #15291f; 
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  border-bottom: 2px solid #cddc39; 
+}
+
+.nav-brand span {
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #cddc39;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover {
+  background-color: rgba(205, 220, 57, 0.1);
+  color: #cddc39;
+}
+
+.nav-links a.active {
+  background-color: #cddc39;
+  color: #15291f;
+  font-weight: bold;
+}
+
+.nav-links a.active {
+  background-color: #cddc39;
+  color: #15291f; 
+  font-weight: bold;
+}
+
+.nav-spacer {
+  flex-grow: 1;
+}
+
+.toolbar {
+  margin: 2rem; 
+  display: flex;
+  align-items: center;
+}
+
+
+.btn-volver {
+  background-color: transparent; 
+  border: 2px solid rgba(205, 220, 57, 0.3); 
+  border-radius: 50px; 
+  padding: 8px 20px;
+  color: #cddc39; 
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrow {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.fixture-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: white;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.page-header h2 {
+  text-align: center;
+  color: #cddc39;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+
+.matchday-card {
+  background-color: #f0f7f4;
+  border-radius: 12px;
+  overflow: hidden; 
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  color: #1e392a; 
+}
+
+.matchday-header {
+  background-color: #1e392a; 
+  color: white;
+  padding: 10px 20px;
+  border-bottom: 3px solid #cddc39;
+}
+
+.matchday-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.matches-list {
+  padding: 10px 0;
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr; 
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s;
+}
+
+.match-row:last-child {
+  border-bottom: none;
+}
+
+.match-row:hover {
+  background-color: rgba(0,0,0,0.03);
+}
+
+.team {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.team.home {
+  text-align: right; 
+  padding-right: 10px;
+}
+
+.team.away {
+  text-align: left; 
+  padding-left: 10px;
+}
+
+.score-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.vs-badge {
+  background-color: #e0e0e0;
+  color: #777;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.match-row.played .score-number {
+  color: #1e392a;
+}
+.match-row.played .divider {
+  margin: 0 5px;
+  color: #999;
+}
+
+.no-matches {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #777;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+@media (max-width: 768px) {
+  .game-navbar {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .toolbar {
+    margin: 1rem;
+  }
+
+  .fixture-container {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .match-row {
+    grid-template-columns: 1fr 64px 1fr; /* Reducir espacio central */
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
+
+  .team {
+    font-size: 0.88rem;
+    word-break: break-word;
+  }
+}

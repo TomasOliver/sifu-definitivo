@@ -1,0 +1,206 @@
+.simulacion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh; 
+  color: white;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #cddc39;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 3rem;
+}
+
+.simulation-controls {
+  display: flex;
+  align-items: center;
+  gap: 3rem; 
+}
+
+.sim-btn {
+  width: 220px;
+  height: 280px; 
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sim-btn:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.btn-primary:hover {
+  border-color: #cddc39;
+  background: rgba(205, 220, 57, 0.1);
+}
+.btn-primary .icon { font-size: 3rem; margin-bottom: 1rem; }
+.btn-primary h3 { color: #cddc39; margin: 0; font-size: 1.2rem; }
+
+.btn-secondary:hover {
+  border-color: #4fc3f7;
+  background: rgba(79, 195, 247, 0.1);
+}
+.btn-secondary .icon { font-size: 3rem; margin-bottom: 1rem; }
+.btn-secondary h3 { color: #4fc3f7; margin: 0; font-size: 1.2rem; }
+
+.sim-btn small {
+  color: rgba(255,255,255,0.5);
+  margin-top: 5px;
+  display: block;
+}
+
+
+.tactical-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #15291f;
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 2px solid #3a5f4a;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  position: relative;
+  z-index: 10; 
+}
+
+.formation-label {
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.team-name-display {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #cddc39;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.football-pitch-mini {
+  width: 200px;  
+  height: 280px; 
+  background-color: #2e7d32;
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.1) 20px, rgba(0,0,0,0.1) 40px);
+}
+
+.center-line { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(255,255,255,0.4); }
+.center-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; }
+.penalty-area-top { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 50%; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-top: none; }
+.penalty-area-bottom { position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 50%; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-bottom: none; }
+
+.line {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 2;
+}
+
+.player-dot {
+  width: 14px;
+  height: 14px;
+  background-color: #fff; 
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  border: 2px solid #15291f;
+}
+
+.player-dot.gk {
+  background-color: #ffeb3b; 
+}
+
+
+.toolbar {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+}
+.btn-volver {
+  background: transparent;
+  border: 2px solid #cddc39;
+  color: #cddc39;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.btn-volver:hover {
+  background: #cddc39;
+  color: #15291f;
+}
+
+
+@media (max-width: 900px) {
+  .toolbar {
+    position: static;
+    width: 100%;
+    padding: 1rem 1rem 0 1rem;
+  }
+
+  .simulacion-container {
+    padding: 1rem;
+    min-height: auto;
+  }
+
+  .page-title {
+    font-size: clamp(1.5rem, 1.1rem + 2.5vw, 2.2rem);
+    text-align: center;
+  }
+
+  .subtitle {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .simulation-controls {
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+    gap: 1.25rem;
+  }
+
+  .tactical-preview {
+    order: -1;
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+
+  .sim-btn {
+    width: 100%;
+    height: 100px;
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

@@ -1,0 +1,70 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+  
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId]" class="active">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]" >Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
+  </div>
+  
+  <div class="nav-spacer"></div>
+</nav>
+<div class="toolbar">
+    <button class="btn-volver" (click)="goBack()">
+      <span class="arrow">&larr;</span> Volver
+    </button>
+  </div>
+
+<div class="fixture-container">
+  
+  <header class="page-header">
+    <h2>Calendario de Partidos</h2>
+  </header>
+
+  <div class="matchdays-grid">
+    @for (fecha of fixtureByMatchday(); track fecha.matchday) {
+
+      <div class="matchday-card">
+        <div class="matchday-header">
+          <h3>Jornada {{ fecha.matchday }}</h3>
+        </div>
+      
+        <div class="matches-list">
+          @for (match of fecha.games; track match.id) {
+
+            <div class="match-row" [class.played]="match.played">
+              
+              <div class="team home">
+                <span class="team-name">{{ getTeamName(match.homeTeamId) }}</span>
+                </div>
+
+              <div class="score-box">
+                @if (match.played) {
+                  <span class="score-number">{{ match.homeGoals }}</span>
+                  <span class="divider">-</span>
+                  <span class="score-number">{{ match.awayGoals }}</span>
+                } @else {
+                  <span class="vs-badge">VS</span>
+                }
+              </div>
+
+              <div class="team away">
+                <span class="team-name">{{ getTeamName(match.awayTeamId) }}</span>
+              </div>
+
+            </div>
+
+          } @empty {
+            <p class="no-matches">No hay partidos programados.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

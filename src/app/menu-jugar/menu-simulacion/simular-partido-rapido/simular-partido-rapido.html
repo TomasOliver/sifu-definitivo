@@ -1,0 +1,110 @@
+<div class="toolbar">
+    <button class="btn-volver" (click)="navigateToMenuInicio(teamId)">
+      <span class="arrow">&larr;</span> VOLVER
+    </button>
+  </div>
+
+<div class="simulacion-rapida-container">
+
+  <div class="match-header">
+    <div class="marcador">
+      <span class="team-name">{{ homeTeam?.name }}</span>
+      <div class="score-box">{{ score().home }} - {{ score().away }}</div>
+      <span class="team-name">{{ awayTeam?.name }}</span>
+    </div>
+  </div>
+
+
+  <div class="contenedor-eventos">
+
+    <div class="columna col-home">
+      <h3 class="titulo-equipo">{{ homeTeam?.name }}</h3>
+
+      @for (e of events(); track $index) {
+        @if (e.teamId == homeTeam?.id) {
+          <div class="evento home" 
+               [class.goal]="e.type === 'goal'"
+               [class.yellow-card]="e.type === 'yellow'"
+               [class.red-card]="e.type === 'red'">
+            
+            <span class="minuto">{{ e.minute }}'</span>
+            
+            <div class="event-icon">
+              @switch (e.type) {
+                @case ('goal') { ⚽ }
+                @case ('yellow') { 🟨 }
+                @case ('red') { 🟥 }
+                @case ('assist') { 👟 }
+                @default { 🔹 }
+              }
+            </div>
+
+            <div class="texto">
+              @if (e.type === 'goal') {
+                <strong>¡GOL!</strong> {{ getPlayerName(homeTeam, e.playerId) }}
+              } 
+              @else if (e.type === 'yellow') {
+                 {{ getPlayerName(homeTeam, e.playerId) }}
+              }
+              @else if (e.type === 'red') {
+                 {{ getPlayerName(homeTeam, e.playerId) }}
+              }
+              @else {
+                {{ getPlayerName(homeTeam, e.playerId) }}
+              }
+
+              @if (e.assistId) {
+                <span class="asist">(Asist: {{ getPlayerName(homeTeam, e.assistId) }})</span>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="columna col-away">
+      <h3 class="titulo-equipo">{{ awayTeam?.name }}</h3>
+
+      @for (e of events(); track $index) {
+        @if (e.teamId == awayTeam?.id) {
+          <div class="evento away"
+               [class.goal]="e.type === 'goal'"
+               [class.yellow-card]="e.type === 'yellow'"
+               [class.red-card]="e.type === 'red'">
+            
+            <span class="minuto">{{ e.minute }}'</span>
+
+            <div class="event-icon">
+              @switch (e.type) {
+                @case ('goal') { ⚽ }
+                @case ('yellow') { 🟨 }
+                @case ('red') { 🟥 }
+                @case ('assist') { 👟 }
+                @default { 🔹 }
+              }
+            </div>
+
+            <div class="texto">
+              @if (e.type === 'goal') {
+                <strong>¡GOL!</strong> {{ getPlayerName(awayTeam, e.playerId) }}
+              } 
+              @else if (e.type === 'yellow') {
+                {{ getPlayerName(awayTeam, e.playerId) }}
+              }
+              @else if (e.type === 'red') {
+                {{ getPlayerName(awayTeam, e.playerId) }}
+              }
+              @else {
+                {{ getPlayerName(awayTeam, e.playerId) }}
+              }
+
+              @if (e.assistId) {
+                <span class="asist">(Asist: {{ getPlayerName(awayTeam, e.assistId) }})</span>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

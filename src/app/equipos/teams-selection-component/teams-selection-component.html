@@ -1,0 +1,47 @@
+<div class="selection-header">
+    <a routerLink="/menu" class="btn-volver-menu">&larr; Volver al Menú</a>
+    <h1>EQUIPOS DISPONIBLES</h1>
+</div>
+
+<div class="search-container">
+    <input 
+        type="text" 
+        placeholder="Buscar equipo por nombre o abreviatura..." 
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        class="search-input"
+    >
+</div>
+
+@if (isLoading()) {
+    <div class="loading-msg">
+        <p>Cargando equipos...</p>
+    </div>
+} @else {
+    
+    <div class="teams-list">
+        @for (equipo of filteredTeams(); track equipo.id) {
+            <div class="team-card">
+                <div class="team-info">
+                    <img 
+                      class="team-logo" 
+                      [src]="getTeamLogo(equipo.id)" 
+                      (error)="handleMissingImage($event)"
+                      alt="Logo de {{ equipo.name }}" 
+                    />
+                    <span class="team-name">{{ equipo.name }}</span>
+                    <span class="team-short">/ {{ equipo.shortName }}</span>
+                </div>
+                
+                <div class="team-actions">
+                    <button class="btn-secondary" (click)="navigateToPlantel(equipo.id)">Ver Plantel</button>
+                    @if (saveName) {
+                        <button class="btn-primary" (click)="onTeamClick(equipo)">Seleccionar</button>
+                    }
+                </div>
+            </div>
+        } @empty {
+            <p class="no-results">No se encontraron equipos que coincidan con "{{ searchTerm() }}"</p>
+        }
+    </div>
+}

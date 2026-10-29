@@ -1,0 +1,225 @@
+.simulacion-rapida-container {
+  max-width: 1000px; 
+  margin: 0 auto; 
+  padding: 2rem;
+  color: #ecf0f1;
+  font-family: 'Roboto', sans-serif;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.toolbar {
+  margin: 2rem;
+}
+
+button {
+  background: transparent;
+  border: 2px solid #cddc39;
+  color: #cddc39;
+  padding: 8px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+button:hover {
+  background: rgba(205, 220, 57, 0.1);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(205, 220, 57, 0.3);
+}
+
+button.arrow {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+button:hover .arrow {
+  transform: translateX(-3px);
+}
+
+.match-header {
+  background: linear-gradient(180deg, #1e392a 0%, #15291f 100%);
+  border-bottom: 3px solid #cddc39;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.marcador {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.team-name {
+  flex: 1;
+  text-align: center;
+  color: #fff;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.score-box {
+  background-color: #000;
+  color: #cddc39; 
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-size: 2.5rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  letter-spacing: 5px;
+  border: 2px solid #3a5f4a;
+  min-width: 120px;
+  text-align: center;
+}
+
+.contenedor-eventos {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 2rem; 
+}
+
+
+.columna {
+  background: rgba(255, 255, 255, 0.95); 
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  min-height: 300px; 
+  border-top: 5px solid transparent; 
+}
+
+.titulo-equipo {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #333;
+  text-transform: uppercase;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.evento {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.evento:hover {
+  transform: translateX(5px);
+  border-color: #ccc;
+}
+
+
+.minuto {
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: #555;
+  min-width: 30px;
+  text-align: right;
+}
+
+.texto {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+}
+
+.asist {
+  color: #777;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+
+.col-home {
+  border-top-color: #2e7d32; 
+}
+.evento.home {
+  border-left: 4px solid #2e7d32;
+}
+.evento.home .minuto { color: #2e7d32; }
+
+
+.col-away {
+  border-top-color: #d32f2f; 
+}
+.evento.away {
+  border-left: 4px solid #d32f2f;
+}
+.evento.away .minuto { color: #d32f2f; }
+
+
+@media (max-width: 768px) {
+  .toolbar {
+    margin: 1rem;
+  }
+
+  .simulacion-rapida-container {
+    padding: 1rem;
+  }
+
+  .contenedor-eventos {
+    grid-template-columns: 1fr; 
+    gap: 1.25rem;
+  }
+  
+  .marcador {
+    flex-direction: column; 
+    gap: 10px;
+  }
+  
+  .score-box {
+    font-size: 2rem;
+    padding: 5px 20px;
+  }
+  
+  .team-name { font-size: 1.2rem; }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+.event-icon {
+  font-size: 1.2rem; 
+  min-width: 30px;   
+  text-align: center;
+  margin-right: 8px;
+}
+
+
+.texto {
+  flex: 1; 
+}
+
+
+.evento.goal {
+  background-color: rgba(205, 220, 57, 0.2); 
+  border-color: #cddc39;
+}
+
+.evento.red-card {
+  background-color: rgba(244, 67, 54, 0.1); 
+  border-color: #f44336;
+}

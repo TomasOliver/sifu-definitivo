@@ -1,0 +1,49 @@
+<header>
+  <a (click)="logout()">Cerrar Sesión</a>
+</header>
+
+<div class="menu-container">
+  
+  @if (user) {
+    <h1 class="welcome-title">Bienvenido, {{ user.username }}</h1>
+  } 
+
+  <div class="menu-options">
+
+    <div class="menu-card action-card" (click)="openNewGameModal()">
+      <h2>Nueva Partida</h2>
+      <p>Comienza una nueva carrera como Director Técnico.</p>
+    </div>
+    
+    <a routerLink="/listaPartidasGuardadas" class="menu-card">
+      <h2>Cargar Partida</h2>
+      <p>Continúa tus partidas guardadas.</p>
+    </a>
+
+  </div>
+</div>
+
+@if (isModalOpen()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Crear Nueva Partida</h2>
+      <p>Asigna un nombre para identificar tu carrera.</p>
+      
+      <div class="input-group">
+        <label>Nombre de la Partida:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="newSaveName" 
+          placeholder="Ej: Gloria del Manchester..."
+          (keyup.enter)="continueToTeamSelection()" 
+          autofocus
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        <button class="btn-confirm" (click)="continueToTeamSelection()">Continuar</button>
+      </div>
+    </div>
+  </div>
+}

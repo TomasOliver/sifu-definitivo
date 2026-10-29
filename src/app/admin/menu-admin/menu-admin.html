@@ -1,0 +1,41 @@
+<div class="admin-dashboard">
+  <header class="admin-header">
+    <h1>🛠️ Panel de Administrador 👨‍💻</h1>
+    <p>Administración de la Base de Datos</p>
+  </header>
+
+  <div class="menu-grid">
+    
+    <button class="menu-card card-create" routerLink="/formAgregarJugador">
+      <div class="icon">➕</div>
+      <div class="content">
+        <h3>Alta de Jugador</h3>
+        <span>Registrar nueva ficha</span>
+      </div>
+    </button>
+
+    <button class="menu-card card-manage" routerLink="/menuAdmin/db">
+      <div class="icon">📂</div> <div class="content">
+        <h3>Base de Datos Global</h3>
+        <span>Buscar, Editar y Eliminar</span>
+      </div>
+    </button>
+
+    <button class="menu-card card-reset" (click)="alertaFutura()">
+      <div class="icon">⚠️</div>
+      <div class="content">
+        <h3>Resetear Temporada</h3>
+        <span>Restaurar valores iniciales</span>
+      </div>
+    </button>
+
+    <button class="menu-card card-logout" (click)="logout()">
+      <div class="icon">🚪</div>
+      <div class="content">
+        <h3>Cerrar Sesión</h3>
+        <span>Salir del panel admin</span>
+      </div>
+    </button>
+
+  </div>
+</div>

@@ -1,0 +1,155 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]" class="active">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]" >Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
+  </div>
+  <div class="nav-spacer"></div>
+</nav>
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+</div>
+
+<div class="container">
+  @if (isLoading()) {
+  <div style="text-align: center; margin-top: 50px;">
+    <p>Cargando tácticas...</p>
+  </div>
+  } @else if (team(); as currentTeam) {
+
+  <h2>
+    <img class="team-logo" [src]="getTeamLogo(currentTeam.id)" (error)="handleMissingImage($event)"
+      alt="Logo de {{ currentTeam.name }}" />
+    {{ currentTeam.name }} <small>({{ currentTeam.shortName }})</small>
+  </h2>
+
+  @if (errorMessage()) {
+  <div class="tactical-alert">
+    <span>{{ errorMessage() }}</span>
+    <button (click)="errorMessage.set(null)">✖</button>
+  </div>
+  }
+  <div class="plantel-container">
+
+    <div class="columna">
+      <h3>TITULARES (11)</h3>
+
+      @for (player of titulares(); track player.id) {
+      <div class="player-card" [class.selected]="jugadorSeleccionado?.id === player.id">
+
+        <div class="card-info">
+          <div class="rating-badge">{{ player.rating }}</div>
+          <div class="details">
+            <h4>{{ player.name }}</h4>
+            <span>{{ player.position }}</span>
+          </div>
+        </div>
+
+        @if (jugadorSeleccionado?.id === player.id) {
+        <button class="btn-action btn-cancel" (click)="jugadorSeleccionado = null">
+          Cancelar
+        </button>
+        } @else {
+        <button class="btn-action btn-select" [disabled]="jugadorSeleccionado !== null"
+          [style.opacity]="jugadorSeleccionado ? '0.3' : '1'" (click)="jugadorSeleccionado = player">
+          🔄
+        </button>
+        }
+
+      </div>
+      }
+    </div>
+    <div class="tactical-dashboard">
+
+      <span class="label">Esquema: {{ currentFormation() }}</span>
+
+      <div class="football-pitch">
+
+        <div class="penalty-area-top"></div>
+        <div class="center-circle"></div>
+        <div class="center-line"></div>
+
+        <div class="line forward-line">
+          @for (p of viewFW(); track p.id) {
+          <div class="player-token" title="{{p.name}}">
+            <div class="jersey-icon"></div>
+            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="line mid-line">
+          @for (p of viewMF(); track p.id) {
+          <div class="player-token" title="{{p.name}}">
+            <div class="jersey-icon"></div>
+            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="line def-line">
+          @for (p of viewDF(); track p.id) {
+          <div class="player-token" title="{{p.name}}">
+            <div class="jersey-icon"></div>
+            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="line gk-line">
+          @for (p of viewGK(); track p.id) {
+          <div class="player-token gk" title="{{p.name}}">
+            <div class="jersey-icon"></div>
+            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="penalty-area-bottom"></div>
+
+      </div>
+    </div>
+
+    <div class="columna">
+      <h3>BANQUILLO</h3>
+
+      @for (player of suplentes(); track player.id) {
+      <div class="player-card" [class.swap-mode]="jugadorSeleccionado">
+
+        <div class="card-info">
+          <div class="rating-badge">{{ player.rating }}</div>
+          <div class="details">
+            <h4>{{ player.name }}</h4>
+            <span>{{ player.position }}</span>
+          </div>
+        </div>
+
+        <button class="btn-action btn-swap" [disabled]="!jugadorSeleccionado"
+          (click)="cambiarJugador(jugadorSeleccionado!, player)">
+
+          @if (jugadorSeleccionado) {
+          Entrar ⬆️
+          } @else {
+          Espera
+          }
+        </button>
+
+      </div>
+      }
+    </div>
+
+  </div>
+
+  } @else {
+  <p>No se pudo cargar el equipo.</p>
+  }
+</div>

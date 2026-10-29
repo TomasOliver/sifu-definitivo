@@ -1,0 +1,196 @@
+.simulacion-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: #ecf0f1;
+  font-family: 'Roboto', sans-serif;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.toolbar { margin-bottom: 2rem; }
+.btn-volver {
+  background: transparent; border: 2px solid #cddc39; color: #cddc39;
+  padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold;
+  transition: all 0.3s; display: flex; align-items: center; gap: 8px;
+}
+.btn-volver:hover { background: rgba(205, 220, 57, 0.1); color: #fff; }
+.btn-volver .arrow { font-size: 1.2rem; line-height: 1; }
+
+
+.live-scoreboard {
+  background: linear-gradient(180deg, #1e392a 0%, #15291f 100%);
+  border-bottom: 4px solid #cddc39;
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-box {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0,0,0,0.6);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #cddc39;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.live-dot {
+  width: 8px; height: 8px; background-color: #f44336; border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+.team-box {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.score-display {
+  font-size: 4rem;
+  font-weight: 900;
+  font-family: 'Courier New', monospace;
+  color: #fff;
+  background-color: rgba(255,255,255,0.1);
+  padding: 10px 30px;
+  border-radius: 12px;
+  min-width: 180px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+
+.match-log-container {
+  background-color: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  height: 400px; 
+  overflow-y: auto; 
+  padding: 1.5rem;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.log-header {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  animation: slideInRight 0.3s ease-out;
+  color: #333;
+}
+
+.event-time {
+  font-weight: bold;
+  color: #555;
+  min-width: 30px;
+}
+
+.event-icon {
+  font-size: 1.2rem;
+  width: 30px;
+  text-align: center;
+}
+
+.event-text {
+  font-size: 1rem;
+}
+
+.event-row.goal {
+  background-color: rgba(205, 220, 57, 0.2); 
+  border-left: 4px solid #cddc39;
+}
+.event-row.goal .event-text { font-weight: bold; color: #1e392a; }
+
+.event-row.red-card {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-left: 4px solid #f44336;
+}
+
+.event-row.yellow-card {
+  border-left: 4px solid #ffeb3b;
+}
+
+@keyframes blink { 50% { opacity: 0.4; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+@media (max-width: 768px) {
+  .simulacion-container {
+    padding: 1rem;
+  }
+
+  .toolbar {
+    margin-bottom: 1rem;
+  }
+
+  .live-scoreboard {
+    flex-direction: column;
+    gap: 12px;
+    padding: 2.5rem 1rem 1.25rem 1rem;
+  }
+
+  .team-name {
+    font-size: clamp(1.1rem, 0.9rem + 1.5vw, 1.4rem);
+  }
+
+  .score-display {
+    font-size: 2.25rem;
+    padding: 8px 20px;
+    min-width: 130px;
+    gap: 12px;
+  }
+
+  .match-log-container {
+    height: 320px;
+    padding: 1rem;
+  }
+
+  .event-row {
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .event-text {
+    font-size: 0.9rem;
+  }
+}

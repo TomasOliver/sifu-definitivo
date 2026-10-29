@@ -1,0 +1,55 @@
+<div class="db-container">
+
+    <header class="db-header">
+        <div class="header-left">
+            <a routerLink="/menuAdmin" class="btn-volver-admin">&larr; Volver al Panel</a>
+            <h1>📂 Base de Datos Global</h1>
+        </div>
+        <div class="search-box">
+            <input type="text" placeholder="Buscar jugador o equipo..." [ngModel]="searchTerm()"
+                (ngModelChange)="searchTerm.set($event)">
+            <span class="count">{{ filteredPlayers().length }} Jugadores encontrados</span>
+        </div>
+    </header>
+
+    <div class="table-wrapper" tabindex="0" role="region" aria-label="Base de datos global de jugadores">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Pos</th>
+                    <th>Media</th>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th class="actions">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (player of filteredPlayers(); track player.id) {
+                <tr>
+                    <td class="fw-bold">{{ player.name }}</td>
+                    <td><span class="badge pos-{{player.position}}">{{ player.position }}</span></td>
+                    <td>{{ player.rating }}</td>
+                    <td>
+                        <a [routerLink]="['/listaTeams', player.teamId]" class="team-link">
+                            {{ player.teamName }}
+                        </a>
+                    </td>
+                    <td>
+                        @if(player.isStarter) { ✅ Titular } @else { 💤 Suplente }
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-icon edit" title="Editar" [routerLink]="[`/formAgregarJugador/${player.teamId}/${player.id}`]">✏️</button>
+
+                        <button class="btn-icon delete" (click)="deletePlayer(player)" title="Eliminar">🗑️</button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron jugadores.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

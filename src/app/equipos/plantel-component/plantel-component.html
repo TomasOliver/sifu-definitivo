@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="toolbar">
+    <button class="btn-volver" (click)="goBack()">
+      <span class="arrow">&larr;</span> Volver
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">Cargando tácticas...</div>
+  } @else if (team(); as currentTeam) {
+
+    <header class="team-header">
+      <h2>{{ currentTeam.name }} <span class="short-name">({{ currentTeam.shortName }})</span></h2>
+    </header>
+
+    <div class="plantel-grid">
+      
+      <div class="columna">
+        <h3 class="section-title">Titulares</h3>
+        
+        @for (player of titulares(); track player.id) {
+          <div class="player-card starter">
+            <div class="rating-box">
+              {{ player.rating }}
+            </div>
+            <div class="player-info">
+              <span class="player-name">{{ player.name }}</span>
+              <span class="player-pos">{{ player.position }}</span>
+            </div>
+            <div class="status-indicator"></div>
+          </div>
+        }
+      </div>
+
+      <div class="columna">
+        <h3 class="section-title">Suplentes</h3>
+        
+        @for (player of suplentes(); track player.id) {
+          <div class="player-card bench">
+            <div class="rating-box sub">
+              {{ player.rating }}
+            </div>
+            <div class="player-info">
+              <span class="player-name">{{ player.name }}</span>
+              <span class="player-pos">{{ player.position }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-msg">No hay suplentes</p>
+        }
+      </div>
+
+    </div>
+
+  } @else {
+    <p>Error al cargar el equipo.</p>
+  }
+</div>

@@ -1,0 +1,151 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Roboto', sans-serif;
+  color: #ecf0f1;
+}
+
+.team-header h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #cddc39; 
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.short-name {
+  font-size: 1.5rem;
+  color: #bdc3c7;
+}
+
+.plantel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.section-title {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  border-bottom: 3px solid #cddc39;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+
+.player-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(145deg, #2c3e50, #233241);
+  margin-bottom: 12px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border-left: 5px solid transparent;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.player-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  background: #34495e;
+}
+
+
+.player-card.starter {
+  border-left-color: #cddc39; 
+}
+
+.player-card.bench {
+  border-left-color: #7f8c8d; 
+  opacity: 0.9;
+}
+
+
+.rating-box {
+  background-color: #cddc39;
+  color: #2c3e50;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-right: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.rating-box.sub {
+  background-color: #95a5a6;
+  color: #fff;
+}
+
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.player-pos {
+  font-size: 0.85rem;
+  color: #bdc3c7;
+  font-weight: 500;
+}
+
+
+.toolbar {
+  margin-bottom: 20px;
+}
+
+.btn-volver {
+  background: transparent;
+  border: 2px solid #cddc39;
+  color: #cddc39;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-volver:hover {
+  background: #cddc39;
+  color: #1e392a;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .team-header h2 {
+    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.2rem);
+    margin-bottom: 1.25rem;
+  }
+
+  .short-name {
+    font-size: 1.1rem;
+  }
+
+  .plantel-grid {
+    grid-template-columns: 1fr; 
+    gap: 1.25rem;
+  }
+}

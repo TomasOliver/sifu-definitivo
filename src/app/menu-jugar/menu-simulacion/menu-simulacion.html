@@ -1,0 +1,65 @@
+
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> VOLVER
+  </button>
+</div>
+
+<div class="simulacion-container">
+  
+  <h1 class="page-title">PREVIA DEL PARTIDO</h1>
+  <p class="subtitle">Elige cómo quieres jugar este encuentro</p>
+
+ 
+  <div class="simulation-controls">
+
+    
+    <button class="sim-btn btn-primary" (click)="navigateToSimulacionPartido(teamId)">
+      <div class="btn-content">
+        <span class="icon"></span>
+        <h3>JUGAR PARTIDO</h3>
+        <small>Modo tiempo real</small>
+      </div>
+    </button>
+
+    
+    <div class="tactical-preview">
+      <span class="formation-label">Tu Formación: <strong>{{ currentFormation() }}</strong></span>
+      
+      <div class="football-pitch-mini">
+       
+        <div class="center-circle"></div>
+        <div class="center-line"></div>
+        <div class="penalty-area-top"></div>
+        <div class="penalty-area-bottom"></div>
+
+       
+        <div class="line forward-line">
+          @for (p of viewFW(); track p.id) { <div class="player-dot" title="{{p.name}}"></div> }
+        </div>
+        <div class="line mid-line">
+          @for (p of viewMF(); track p.id) { <div class="player-dot" title="{{p.name}}"></div> }
+        </div>
+        <div class="line def-line">
+          @for (p of viewDF(); track p.id) { <div class="player-dot" title="{{p.name}}"></div> }
+        </div>
+        <div class="line gk-line">
+          @for (p of viewGK(); track p.id) { <div class="player-dot gk" title="{{p.name}}"></div> }
+        </div>
+      </div>
+
+      <div class="team-name-display">
+        {{ team()?.name }}
+      </div>
+    </div>
+
+   
+    <button class="sim-btn btn-secondary" (click)="navigateToSimulacionPartidoRapido(teamId)">
+      <div class="btn-content">
+        <span class="icon"></span>
+        <h3>SIMULACIÓN RÁPIDA</h3>
+        <small>Resultado instantáneo</small>
+      </div>
+    </button>
+  </div>
+</div>

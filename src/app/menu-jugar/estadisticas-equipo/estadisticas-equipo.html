@@ -1,0 +1,75 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
+    <a [routerLink]="['/fixture', teamId]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]" class="active">Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
+  </div>
+
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+</div>
+
+<div class="container">
+  
+  <header class="page-header">
+    <h2>Rendimiento del Plantel</h2>
+  </header>
+
+  <div class="stats-grid">
+    
+    @for (p of team()?.squad ?? []; track p.id) {
+      <div class="player-stat-card">
+        
+        <div class="card-header">
+          <span class="player-pos">{{ p.position }}</span>
+          <h3 class="player-name">{{ p.name }}</h3>
+        </div>
+
+        <div class="stats-body">
+          
+          <div class="stat-item">
+            <span class="label">PJ</span>
+            <span class="value">{{ p.stats.starts }}</span>
+          </div>
+
+          <div class="stat-item highlight-green">
+            <span class="label">Goles</span>
+            <span class="value">{{ p.stats.goals }}</span>
+          </div>
+
+          <div class="stat-item">
+            <span class="label">Asist.</span>
+            <span class="value">{{ p.stats.assists }}</span>
+          </div>
+
+          <div class="stat-item cards-group">
+            <div class="card-indicator yellow" title="Amarillas">
+              {{ p.stats.yellowCards }}
+            </div>
+            <div class="card-indicator red" title="Rojas">
+              {{ p.stats.redCards }}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    } @empty {
+      <p class="empty-msg">No hay jugadores disponibles.</p>
+    }
+
+  </div>
+
+</div>
