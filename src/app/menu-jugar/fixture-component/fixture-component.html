@@ -8,53 +8,224 @@
     <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
     <a [routerLink]="['/fixture', teamId]" class="active">Fixture</a>
     <a [routerLink]="['/tabla', teamId]">Tabla</a>
-    <a [routerLink]="['/estadisticasEquipo', teamId]" >Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]">Estadísticas Equipo</a>
     <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
   </div>
   
   <div class="nav-spacer"></div>
 </nav>
+
 <div class="toolbar">
-    <button class="btn-volver" (click)="goBack()">
-      <span class="arrow">&larr;</span> Volver
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+
+  <div class="toolbar-actions">
+    @if (selectedMatchday() !== activeSeasonMatchday() || viewAllMatchdays()) {
+      <button class="btn-quick-action" (click)="goToActiveMatchday()">
+        Ir a Jornada en curso (J{{ activeSeasonMatchday() }})
+      </button>
+    }
+    <button class="btn-quick-action secondary" (click)="toggleViewAll()">
+      {{ viewAllMatchdays() ? 'Vista por Jornada' : 'Ver todas las jornadas' }}
     </button>
   </div>
+</div>
 
 <div class="fixture-container">
   
   <header class="page-header">
     <h2>Calendario de Partidos</h2>
+    <p class="page-subtitle">Tocá cualquier partido para ver el resumen y los comentarios minuto a minuto</p>
   </header>
 
+  <!-- Barra selectora estilo OneFootball -->
+  <div class="onefootball-selector-wrapper">
+    <div class="matchday-selector-bar" [class.open]="isSelectorOpen()">
+      <button
+        type="button"
+        class="nav-step-btn"
+        (click)="prevMatchday()"
+        [disabled]="selectedMatchday() <= minMatchday() && !viewAllMatchdays()"
+        title="Jornada anterior">
+        &#8249;
+      </button>
+
+      <button type="button" class="selector-trigger" (click)="toggleSelector()">
+        <div class="selector-trigger-info">
+          <span class="selector-title">
+            @if (viewAllMatchdays()) {
+              Todas las Jornadas (1 - {{ maxMatchday() }})
+            } @else {
+              Jornada {{ selectedMatchday() }}
+            }
+          </span>
+          @if (!viewAllMatchdays() && currentMatchdayData(); as currentMd) {
+            <span class="selector-subtitle">
+              @if (currentMd.allPlayed) {
+                Finalizada · {{ currentMd.totalCount }} partidos
+              } @else if (currentMd.matchday === activeSeasonMatchday()) {
+                En curso · {{ currentMd.totalCount }} partidos
+              } @else {
+                Por disputar · {{ currentMd.totalCount }} partidos
+              }
+            </span>
+          }
+        </div>
+
+        <span class="chevron-icon" [class.rotated]="isSelectorOpen()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-step-btn"
+        (click)="nextMatchday()"
+        [disabled]="selectedMatchday() >= maxMatchday() && !viewAllMatchdays()"
+        title="Jornada siguiente">
+        &#8250;
+      </button>
+    </div>
+
+    <!-- Lista desplegable estilo OneFootball (Foto 2) -->
+    @if (isSelectorOpen()) {
+      <div class="selector-backdrop" (click)="closeSelector()"></div>
+      <div class="matchday-dropdown-panel">
+        <div class="dropdown-panel-header">
+          <span>Seleccionar Jornada</span>
+          <button type="button" class="close-dropdown-btn" (click)="closeSelector()">&times;</button>
+        </div>
+
+        <div class="matchday-dropdown-list">
+          @for (md of fixtureByMatchday(); track md.matchday) {
+            <button
+              type="button"
+              class="matchday-dropdown-item"
+              [class.selected]="!viewAllMatchdays() && md.matchday === selectedMatchday()"
+              [class.is-current]="md.matchday === activeSeasonMatchday()"
+              (click)="selectMatchday(md.matchday)">
+              <div class="dropdown-item-left">
+                <span class="dropdown-item-title">Jornada {{ md.matchday }}</span>
+                <span class="dropdown-item-sub">
+                  @if (md.allPlayed) {
+                    Completada ({{ md.playedCount }}/{{ md.totalCount }} jugados)
+                  } @else if (md.matchday === activeSeasonMatchday()) {
+                    Jornada actual en curso
+                  } @else {
+                    Pendiente ({{ md.totalCount }} partidos)
+                  }
+                </span>
+              </div>
+
+              <div class="dropdown-item-right">
+                @if (md.matchday === activeSeasonMatchday()) {
+                  <span class="status-pill current">En curso</span>
+                } @else if (md.allPlayed) {
+                  <span class="status-pill finished">Finalizada</span>
+                } @else {
+                  <span class="status-pill upcoming">Próxima</span>
+                }
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Listado de partidos estilo OneFootball (Foto 1) -->
   <div class="matchdays-grid">
-    @for (fecha of fixtureByMatchday(); track fecha.matchday) {
+    @for (fecha of displayedMatchdays(); track fecha.matchday) {
 
       <div class="matchday-card">
         <div class="matchday-header">
-          <h3>Jornada {{ fecha.matchday }}</h3>
+          <div class="matchday-header-left">
+            <h3>Jornada {{ fecha.matchday }}</h3>
+            <span class="matchday-sub-label">
+              @if (fecha.allPlayed) {
+                Resultados finales · Click en un partido para ver detalles
+              } @else if (fecha.matchday === activeSeasonMatchday()) {
+                Fecha activa del campeonato
+              } @else {
+                Partidos programados
+              }
+            </span>
+          </div>
+
+          <span class="matchday-count-badge">
+            {{ fecha.playedCount }}/{{ fecha.totalCount }} Jugados
+          </span>
         </div>
       
         <div class="matches-list">
           @for (match of fecha.games; track match.id) {
 
-            <div class="match-row" [class.played]="match.played">
+            <div
+              class="match-row clickable"
+              [class.played]="match.played"
+              [class.user-match]="isUserTeam(match.homeTeamId) || isUserTeam(match.awayTeamId)"
+              (click)="openMatchDetail(match)"
+              role="button"
+              tabindex="0"
+              (keydown.enter)="openMatchDetail(match)">
               
-              <div class="team home">
-                <span class="team-name">{{ getTeamName(match.homeTeamId) }}</span>
+              <!-- Columna izquierda: Equipos apilados con sus escudos estilo OneFootball -->
+              <div class="match-teams-stack">
+                <div
+                  class="team-line"
+                  [class.winner]="match.played && match.homeGoals > match.awayGoals"
+                  [class.my-team]="isUserTeam(match.homeTeamId)">
+                  <img
+                    class="team-crest"
+                    [src]="getTeamLogo(match.homeTeamId)"
+                    [alt]="getTeamName(match.homeTeamId)"
+                    onerror="this.src='/logos/default.png'" />
+                  <span class="team-name">{{ getTeamName(match.homeTeamId) }}</span>
+                  @if (isUserTeam(match.homeTeamId)) {
+                    <span class="my-team-tag">TU EQUIPO</span>
+                  }
                 </div>
 
-              <div class="score-box">
-                @if (match.played) {
-                  <span class="score-number">{{ match.homeGoals }}</span>
-                  <span class="divider">-</span>
-                  <span class="score-number">{{ match.awayGoals }}</span>
-                } @else {
-                  <span class="vs-badge">VS</span>
-                }
+                <div
+                  class="team-line"
+                  [class.winner]="match.played && match.awayGoals > match.homeGoals"
+                  [class.my-team]="isUserTeam(match.awayTeamId)">
+                  <img
+                    class="team-crest"
+                    [src]="getTeamLogo(match.awayTeamId)"
+                    [alt]="getTeamName(match.awayTeamId)"
+                    onerror="this.src='/logos/default.png'" />
+                  <span class="team-name">{{ getTeamName(match.awayTeamId) }}</span>
+                  @if (isUserTeam(match.awayTeamId)) {
+                    <span class="my-team-tag">TU EQUIPO</span>
+                  }
+                </div>
               </div>
 
-              <div class="team away">
-                <span class="team-name">{{ getTeamName(match.awayTeamId) }}</span>
+              <!-- Columna derecha separada por línea divisoria vertical -->
+              <div class="match-status-col">
+                @if (match.played) {
+                  <div class="scores-stack">
+                    <span class="score-val" [class.winner-score]="match.homeGoals > match.awayGoals">
+                      {{ match.homeGoals }}
+                    </span>
+                    <span class="score-val" [class.winner-score]="match.awayGoals > match.homeGoals">
+                      {{ match.awayGoals }}
+                    </span>
+                  </div>
+                  <div class="match-right-meta">
+                    <span class="ft-badge">FINAL</span>
+                    <span class="detail-hint">Ver detalle &rsaquo;</span>
+                  </div>
+                } @else {
+                  <div class="unplayed-info">
+                    <span class="vs-badge">POR JUGAR</span>
+                    <span class="detail-hint">Ver previa &rsaquo;</span>
+                  </div>
+                }
               </div>
 
             </div>
@@ -68,3 +239,299 @@
   </div>
 
 </div>
+
+<!-- =========================================================
+     MODAL DE DETALLE DEL PARTIDO (RESUMEN Y COMENTARIOS)
+     ========================================================= -->
+@if (selectedMatchDetails(); as detail) {
+  <div class="match-detail-backdrop" (click)="closeMatchDetail()">
+    <div class="match-detail-modal" (click)="$event.stopPropagation()">
+
+      <!-- Barra superior del modal -->
+      <div class="modal-topbar">
+        <span class="modal-matchday-pill">Jornada {{ detail.match.matchday }}</span>
+        <span class="modal-status-label">
+          @if (detail.match.played) {
+            FINALIZADO · 90'
+          } @else {
+            PREVIA DEL PARTIDO
+          }
+        </span>
+        <button type="button" class="modal-close-btn" (click)="closeMatchDetail()" aria-label="Cerrar">
+          &times;
+        </button>
+      </div>
+
+      <!-- Marcador cabecera con escudos -->
+      <div class="modal-scoreboard">
+        <div class="modal-team">
+          <img
+            class="modal-team-crest"
+            [src]="getTeamLogo(detail.match.homeTeamId)"
+            [alt]="getTeamName(detail.match.homeTeamId)"
+            onerror="this.src='/logos/default.png'" />
+          <span class="modal-team-name">{{ getTeamName(detail.match.homeTeamId) }}</span>
+          <span class="modal-team-ovr">Media: {{ detail.homeStats.ratingAvg }}</span>
+        </div>
+
+        <div class="modal-score-center">
+          @if (detail.match.played) {
+            <div class="modal-score-numbers">
+              <span [class.winner]="detail.match.homeGoals > detail.match.awayGoals">{{ detail.match.homeGoals }}</span>
+              <span class="modal-score-sep">-</span>
+              <span [class.winner]="detail.match.awayGoals > detail.match.homeGoals">{{ detail.match.awayGoals }}</span>
+            </div>
+            <span class="modal-ft-chip">FINAL</span>
+          } @else {
+            <div class="modal-vs-circle">VS</div>
+            <span class="modal-ft-chip upcoming">PENDIENTE</span>
+          }
+        </div>
+
+        <div class="modal-team">
+          <img
+            class="modal-team-crest"
+            [src]="getTeamLogo(detail.match.awayTeamId)"
+            [alt]="getTeamName(detail.match.awayTeamId)"
+            onerror="this.src='/logos/default.png'" />
+          <span class="modal-team-name">{{ getTeamName(detail.match.awayTeamId) }}</span>
+          <span class="modal-team-ovr">Media: {{ detail.awayStats.ratingAvg }}</span>
+        </div>
+      </div>
+
+      <!-- Pestañas estilo OneFootball: Resumen | Comentarios (Minuto a Minuto) -->
+      <div class="modal-tabs">
+        <button
+          type="button"
+          class="modal-tab-btn"
+          [class.active]="activeDetailTab() === 'resumen'"
+          (click)="setDetailTab('resumen')">
+          Resumen del Partido
+        </button>
+        <button
+          type="button"
+          class="modal-tab-btn"
+          [class.active]="activeDetailTab() === 'comentarios'"
+          (click)="setDetailTab('comentarios')">
+          Comentarios Minuto a Minuto ({{ detail.events.length }})
+        </button>
+      </div>
+
+      <!-- Contenido del Modal -->
+      <div class="modal-body">
+
+        @if (!detail.match.played) {
+          <div class="unplayed-detail-box">
+            <div class="unplayed-icon">🏟️</div>
+            <h4>Este partido aún no se ha disputado</h4>
+            <p>
+              Corresponde a la <strong>Jornada {{ detail.match.matchday }}</strong>.
+              Una vez que simules esta fecha, podrás consultar aquí el resumen completo de goles,
+              asistencias, tarjetas y los comentarios minuto a minuto generados por el motor de simulación.
+            </p>
+            <div class="pre-match-comparison">
+              <div class="pre-stat-row">
+                <span class="pre-val">{{ detail.homeStats.ratingAvg }}</span>
+                <span class="pre-label">Valoración Media Titulares</span>
+                <span class="pre-val">{{ detail.awayStats.ratingAvg }}</span>
+              </div>
+              <div class="pre-stat-row">
+                <span class="pre-val">{{ detail.homeTeam?.squad?.length ?? 0 }}</span>
+                <span class="pre-label">Jugadores en Plantel</span>
+                <span class="pre-val">{{ detail.awayTeam?.squad?.length ?? 0 }}</span>
+              </div>
+            </div>
+          </div>
+        } @else {
+
+          <!-- TAB 1: RESUMEN DEL PARTIDO -->
+          @if (activeDetailTab() === 'resumen') {
+            <div class="summary-section">
+
+              <!-- Barras comparativas de estadísticas del partido -->
+              <div class="stats-comparison-card">
+                <h4 class="section-mini-title">Estadísticas del Encuentro</h4>
+
+                <div class="stat-compare-row">
+                  <span class="stat-num" [class.lead]="detail.homeStats.goals > detail.awayStats.goals">{{ detail.homeStats.goals }}</span>
+                  <span class="stat-name">⚽ Goles</span>
+                  <span class="stat-num" [class.lead]="detail.awayStats.goals > detail.homeStats.goals">{{ detail.awayStats.goals }}</span>
+                </div>
+
+                <div class="stat-compare-row">
+                  <span class="stat-num" [class.lead]="detail.homeStats.assists > detail.awayStats.assists">{{ detail.homeStats.assists }}</span>
+                  <span class="stat-name">👟 Asistencias</span>
+                  <span class="stat-num" [class.lead]="detail.awayStats.assists > detail.homeStats.assists">{{ detail.awayStats.assists }}</span>
+                </div>
+
+                <div class="stat-compare-row">
+                  <span class="stat-num">{{ detail.homeStats.yellows }}</span>
+                  <span class="stat-name">🟨 Tarjetas Amarillas</span>
+                  <span class="stat-num">{{ detail.awayStats.yellows }}</span>
+                </div>
+
+                <div class="stat-compare-row">
+                  <span class="stat-num">{{ detail.homeStats.reds }}</span>
+                  <span class="stat-name">🟥 Tarjetas Rojas</span>
+                  <span class="stat-num">{{ detail.awayStats.reds }}</span>
+                </div>
+              </div>
+
+              <!-- Columnas de incidencias por equipo (mismo formato que SimularPartidoRapido) -->
+              <h4 class="section-mini-title">Incidencias por Equipo</h4>
+
+              @if (detail.events.length === 0) {
+                <div class="empty-events-msg">
+                  Partido sin goles ni tarjetas registradas en los 90 minutos.
+                </div>
+              } @else {
+                <div class="summary-columns">
+                  <!-- Columna Local -->
+                  <div class="summary-col">
+                    <div class="summary-col-header">
+                      <img [src]="getTeamLogo(detail.match.homeTeamId)" alt="" onerror="this.src='/logos/default.png'" />
+                      <span>{{ getTeamName(detail.match.homeTeamId) }}</span>
+                    </div>
+
+                    @for (e of detail.homeEvents; track $index) {
+                      <div
+                        class="summary-event-item"
+                        [class.goal]="e.type === 'goal'"
+                        [class.yellow-card]="e.type === 'yellow'"
+                        [class.red-card]="e.type === 'red'">
+                        <span class="ev-min">{{ e.minute }}'</span>
+                        <span class="ev-ico">
+                          @switch (e.type) {
+                            @case ('goal') { ⚽ }
+                            @case ('yellow') { 🟨 }
+                            @case ('red') { 🟥 }
+                            @case ('assist') { 👟 }
+                            @default { 🔹 }
+                          }
+                        </span>
+                        <div class="ev-info">
+                          @if (e.type === 'goal') {
+                            <strong>¡GOL!</strong> {{ getPlayerName(detail.match.homeTeamId, e.playerId) }}
+                          } @else {
+                            {{ getPlayerName(detail.match.homeTeamId, e.playerId) }}
+                          }
+                          @if (e.assistId) {
+                            <span class="ev-assist">(Asist: {{ getPlayerName(detail.match.homeTeamId, e.assistId) }})</span>
+                          }
+                        </div>
+                      </div>
+                    } @empty {
+                      <p class="col-empty">Sin incidencias</p>
+                    }
+                  </div>
+
+                  <!-- Columna Visitante -->
+                  <div class="summary-col">
+                    <div class="summary-col-header">
+                      <img [src]="getTeamLogo(detail.match.awayTeamId)" alt="" onerror="this.src='/logos/default.png'" />
+                      <span>{{ getTeamName(detail.match.awayTeamId) }}</span>
+                    </div>
+
+                    @for (e of detail.awayEvents; track $index) {
+                      <div
+                        class="summary-event-item"
+                        [class.goal]="e.type === 'goal'"
+                        [class.yellow-card]="e.type === 'yellow'"
+                        [class.red-card]="e.type === 'red'">
+                        <span class="ev-min">{{ e.minute }}'</span>
+                        <span class="ev-ico">
+                          @switch (e.type) {
+                            @case ('goal') { ⚽ }
+                            @case ('yellow') { 🟨 }
+                            @case ('red') { 🟥 }
+                            @case ('assist') { 👟 }
+                            @default { 🔹 }
+                          }
+                        </span>
+                        <div class="ev-info">
+                          @if (e.type === 'goal') {
+                            <strong>¡GOL!</strong> {{ getPlayerName(detail.match.awayTeamId, e.playerId) }}
+                          } @else {
+                            {{ getPlayerName(detail.match.awayTeamId, e.playerId) }}
+                          }
+                          @if (e.assistId) {
+                            <span class="ev-assist">(Asist: {{ getPlayerName(detail.match.awayTeamId, e.assistId) }})</span>
+                          }
+                        </div>
+                      </div>
+                    } @empty {
+                      <p class="col-empty">Sin incidencias</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TAB 2: COMENTARIOS MINUTO A MINUTO (mismo relato que SimularPartido) -->
+          @if (activeDetailTab() === 'comentarios') {
+            <div class="commentary-feed">
+              <div class="commentary-system-row end">
+                <span class="comm-time">90'</span>
+                <span class="comm-icon">🏁</span>
+                <div class="comm-text">
+                  <strong>¡Final del partido!</strong> {{ getTeamName(detail.match.homeTeamId) }} {{ detail.match.homeGoals }} - {{ detail.match.awayGoals }} {{ getTeamName(detail.match.awayTeamId) }}.
+                </div>
+              </div>
+
+              @for (e of detail.reverseEvents; track $index) {
+                <div
+                  class="commentary-row"
+                  [class.goal]="e.type === 'goal'"
+                  [class.yellow-card]="e.type === 'yellow'"
+                  [class.red-card]="e.type === 'red'">
+                  <div class="comm-time">{{ e.minute }}'</div>
+
+                  <div class="comm-icon">
+                    @switch (e.type) {
+                      @case ('assist') { 👟⚽ }
+                      @case ('goal') { ⚽ }
+                      @case ('yellow') { 🟨 }
+                      @case ('red') { 🟥 }
+                      @default { 🔹 }
+                    }
+                  </div>
+
+                  <div class="comm-text">
+                    @if (e.type === 'goal') {
+                      <strong>¡GOOOL!</strong> de {{ getPlayerName(e.teamId, e.playerId) }}
+                      ({{ getTeamShortName(e.teamId) }})
+                      @if (e.assistId) {
+                        <span class="comm-assist"> (👟⚽ Asistencia de {{ getPlayerName(e.teamId, e.assistId) }})</span>
+                      }
+                    } @else if (e.type === 'yellow') {
+                      Tarjeta Amarilla para <strong>{{ getPlayerName(e.teamId, e.playerId) }}</strong> ({{ getTeamShortName(e.teamId) }}).
+                    } @else if (e.type === 'red') {
+                      <strong>¡EXPULSADO!</strong> {{ getPlayerName(e.teamId, e.playerId) }} ({{ getTeamShortName(e.teamId) }}) deja la cancha con tarjeta roja.
+                    } @else {
+                      {{ e.type }} - {{ getPlayerName(e.teamId, e.playerId) }}
+                    }
+                  </div>
+                </div>
+              } @empty {
+                <div class="empty-events-msg">
+                  No se registraron goles ni tarjetas durante los 90 minutos de juego.
+                </div>
+              }
+
+              <div class="commentary-system-row start">
+                <span class="comm-time">1'</span>
+                <span class="comm-icon">⏱️</span>
+                <div class="comm-text">
+                  <strong>¡Comienza el partido!</strong> Ya juegan {{ getTeamName(detail.match.homeTeamId) }} y {{ getTeamName(detail.match.awayTeamId) }} por la Jornada {{ detail.match.matchday }}.
+                </div>
+              </div>
+            </div>
+          }
+
+        }
+      </div>
+
+    </div>
+  </div>
+}

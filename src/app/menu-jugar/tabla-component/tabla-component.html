@@ -7,7 +7,7 @@
     <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
     <a [routerLink]="['/fixture', teamId]">Fixture</a>
     <a [routerLink]="['/tabla', teamId]" class="active">Tabla</a>
-    <a [routerLink]="['/estadisticasEquipo', teamId]" >Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]">Estadísticas Equipo</a>
     <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
   </div>
   <div class="nav-spacer"></div>
@@ -20,51 +20,261 @@
 </div>
 
 <div class="container">
+  <header class="page-header">
+    <h2>Tabla de Posiciones</h2>
+    <p class="page-subtitle">Hacé click en cualquier equipo para ver su formación táctica y las estadísticas de su plantel</p>
+  </header>
+
   <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabla de posiciones de la liga">
-  <table class="tabla-liga">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Equipo</th>
-        <th title="Puntos">PTS</th>
-        <th>PJ</th>
-        <th>G</th>
-        <th>E</th>
-        <th>P</th>
-        <th>GF</th>
-        <th>GC</th>
-        <th>DIF</th>
-      </tr>
-    </thead>
+    <table class="tabla-liga">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Equipo</th>
+          <th title="Puntos">PTS</th>
+          <th>PJ</th>
+          <th>G</th>
+          <th>E</th>
+          <th>P</th>
+          <th>GF</th>
+          <th>GC</th>
+          <th>DIF</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      @for (row of sortedStandings(); track row.teamId; let i = $index) {
+      <tbody>
+        @for (row of sortedStandings(); track row.teamId; let i = $index) {
 
-      <tr>
-        <td>{{ i + 1 }}</td>
+        <tr
+          class="team-row-clickable"
+          [class.user-team-row]="isUserTeam(row.teamId)"
+          (click)="openTeamDetail(row, i)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="openTeamDetail(row, i)">
+          <td>
+            <span class="pos-badge" [class.top-pos]="i < 4" [class.relegation-pos]="i >= 17">
+              {{ i + 1 }}
+            </span>
+          </td>
 
-        <td>
-          <img class="logo" [src]="getTeamLogo(row.teamId)" (error)="handleMissingImage($event)" alt="Escudo" />
-          {{ getTeamName(row.teamId) }}
-        </td>
+          <td>
+            <div class="team-cell-content">
+              <img class="logo" [src]="getTeamLogo(row.teamId)" (error)="handleMissingImage($event)" alt="Escudo" />
+              <span class="team-cell-name">{{ getTeamName(row.teamId) }}</span>
+              @if (isUserTeam(row.teamId)) {
+                <span class="my-team-badge">TU CLUB</span>
+              }
+              <span class="row-detail-hint">Ver plantel &rsaquo;</span>
+            </div>
+          </td>
 
-        <td>{{ row.points }}</td>
-        <td>{{ row.played }}</td>
-        <td>{{ row.wins }}</td>
-        <td>{{ row.draws }}</td>
-        <td>{{ row.losses }}</td>
+          <td>{{ row.points }}</td>
+          <td>{{ row.played }}</td>
+          <td>{{ row.wins }}</td>
+          <td>{{ row.draws }}</td>
+          <td>{{ row.losses }}</td>
 
-        <td>{{ row.goalsFor }}</td>
-        <td>{{ row.goalsAgainst }}</td>
-        <td>{{ row.goalsFor - row.goalsAgainst }}</td>
-      </tr>
+          <td>{{ row.goalsFor }}</td>
+          <td>{{ row.goalsAgainst }}</td>
+          <td>{{ row.goalsFor - row.goalsAgainst }}</td>
+        </tr>
 
-      } @empty {
-      <tr>
-        <td colspan="10">No hay datos aún.</td>
-      </tr>
-      }
-    </tbody>
-  </table>
+        } @empty {
+        <tr>
+          <td colspan="10">No hay datos aún.</td>
+        </tr>
+        }
+      </tbody>
+    </table>
   </div>
 </div>
+
+<!-- =========================================================
+     MODAL DE DETALLE DEL EQUIPO (FORMACIÓN IZQ + JUGADORES DER)
+     ========================================================= -->
+@if (selectedTeamDetail(); as detail) {
+  <div class="team-detail-backdrop" (click)="closeTeamDetail()">
+    <div class="team-detail-modal" (click)="$event.stopPropagation()">
+
+      <!-- Cabecera del Modal -->
+      <div class="team-modal-header">
+        <div class="team-modal-identity">
+          <img
+            class="team-modal-crest"
+            [src]="getTeamLogo(detail.team.id)"
+            (error)="handleMissingImage($event)"
+            [alt]="detail.team.name" />
+          <div class="team-modal-titles">
+            <div class="team-modal-title-row">
+              <h3>{{ detail.team.name }}</h3>
+              <span class="short-code-pill">{{ detail.team.shortName }}</span>
+              @if (isUserTeam(detail.team.id)) {
+                <span class="my-team-badge">TU CLUB</span>
+              }
+            </div>
+            <div class="team-modal-Chips">
+              <span class="meta-chip rank">#{{ detail.position }} en la Liga</span>
+              @if (detail.standing) {
+                <span class="meta-chip">{{ detail.standing.points }} PTS ({{ detail.standing.wins }}G - {{ detail.standing.draws }}E - {{ detail.standing.losses }}P)</span>
+              }
+              <span class="meta-chip">Media Titulares: {{ detail.avgRating }}</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="modal-close-btn" (click)="closeTeamDetail()" aria-label="Cerrar">
+          &times;
+        </button>
+      </div>
+
+      <!-- Cuerpo en 2 columnas: Izquierda Formación | Derecha Jugadores y Estadísticas -->
+      <div class="team-modal-body">
+
+        <!-- COLUMNA IZQUIERDA: FORMACIÓN TÁCTICA -->
+        <div class="formation-column">
+          <div class="column-box-header">
+            <span class="box-title">Esquema Táctico</span>
+            <span class="formation-badge">{{ detail.formation }}</span>
+          </div>
+
+          <div class="football-pitch">
+            <div class="penalty-area-top"></div>
+            <div class="center-circle"></div>
+            <div class="center-line"></div>
+
+            <!-- Delanteros -->
+            <div class="line forward-line">
+              @for (p of detail.viewFW; track p.id) {
+                <div class="player-token" [title]="p.name + ' (' + p.rating + ')'">
+                  <div class="jersey-icon">
+                    <span class="token-rating">{{ p.rating }}</span>
+                  </div>
+                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Mediocampistas -->
+            <div class="line mid-line">
+              @for (p of detail.viewMF; track p.id) {
+                <div class="player-token" [title]="p.name + ' (' + p.rating + ')'">
+                  <div class="jersey-icon">
+                    <span class="token-rating">{{ p.rating }}</span>
+                  </div>
+                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Defensores -->
+            <div class="line def-line">
+              @for (p of detail.viewDF; track p.id) {
+                <div class="player-token" [title]="p.name + ' (' + p.rating + ')'">
+                  <div class="jersey-icon">
+                    <span class="token-rating">{{ p.rating }}</span>
+                  </div>
+                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Arquero -->
+            <div class="line gk-line">
+              @for (p of detail.viewGK; track p.id) {
+                <div class="player-token gk" [title]="p.name + ' (' + p.rating + ')'">
+                  <div class="jersey-icon">
+                    <span class="token-rating">{{ p.rating }}</span>
+                  </div>
+                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="penalty-area-bottom"></div>
+          </div>
+
+          <!-- Resumen rápido de totales del equipo debajo de la cancha -->
+          <div class="team-totals-strip">
+            <div class="total-stat-box">
+              <span class="t-val">⚽ {{ detail.totals.goals }}</span>
+              <span class="t-lbl">Goles</span>
+            </div>
+            <div class="total-stat-box">
+              <span class="t-val">👟 {{ detail.totals.assists }}</span>
+              <span class="t-lbl">Asistencias</span>
+            </div>
+            <div class="total-stat-box">
+              <span class="t-val">🟨 {{ detail.totals.yellows }}</span>
+              <span class="t-lbl">Amarillas</span>
+            </div>
+            <div class="total-stat-box">
+              <span class="t-val">🟥 {{ detail.totals.reds }}</span>
+              <span class="t-lbl">Rojas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: JUGADORES DEL EQUIPO CON SUS ESTADÍSTICAS -->
+        <div class="players-stats-column">
+          <div class="column-box-header">
+            <span class="box-title">Estadísticas del Plantel ({{ detail.orderedSquad.length }} jugadores)</span>
+            <span class="legend-inline">11 Titulares · {{ detail.substitutes.length }} Suplentes</span>
+          </div>
+
+          <div class="players-table-scroll">
+            <table class="squad-stats-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th class="col-player-name">Jugador</th>
+                  <th title="Valoración Media">Media</th>
+                  <th title="Goles">⚽ Goles</th>
+                  <th title="Asistencias">👟 Asist.</th>
+                  <th title="Tarjetas Amarillas">🟨 Amar.</th>
+                  <th title="Tarjetas Rojas">🟥 Rojas</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of detail.orderedSquad; track p.id) {
+                  <tr [class.starter-row]="p.isStarter" [class.sub-row]="!p.isStarter">
+                    <td>
+                      <span class="pos-pill" [attr.data-pos]="p.position">{{ p.position }}</span>
+                    </td>
+                    <td class="col-player-name">
+                      <div class="player-name-cell">
+                        <span class="p-name">{{ p.name }}</span>
+                        @if (p.isStarter) {
+                          <span class="role-tag starter">TITULAR</span>
+                        } @else {
+                          <span class="role-tag sub">SUPLENTE</span>
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      <span class="ovr-circle">{{ p.rating }}</span>
+                    </td>
+                    <td [class.highlight-stat]="p.stats.goals > 0">{{ p.stats.goals }}</td>
+                    <td [class.highlight-stat]="p.stats.assists > 0">{{ p.stats.assists }}</td>
+                    <td>
+                      <span class="card-badge yellow" [class.zero]="p.stats.yellowCards === 0">
+                        {{ p.stats.yellowCards }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="card-badge red" [class.zero]="p.stats.redCards === 0">
+                        {{ p.stats.redCards }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+}
