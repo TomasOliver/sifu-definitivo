@@ -13,5 +13,6 @@ export const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig);
 export const firestoreDb = initializeFirestore(firebaseApp, {
-  ignoreUndefinedProperties: true
+  ignoreUndefinedProperties: true,
+  experimentalAutoDetectLongPolling: true
 });

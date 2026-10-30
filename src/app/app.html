@@ -1,4 +1,6 @@
-<main [class.layout-centered]="isAuthPage()">
+<main [class.layout-centered]="isAuthPage()" [class.layout-full]="isLoginPage()">
   <router-outlet></router-outlet>
 </main>
-<footer>&copy;All Rights Reserved. S.I.F.U Simulador de fulbo Definitivo 2025. </footer>
+@if (!isLoginPage()) {
+  <footer>&copy; 2025 S.I.F.U. Football Manager. Todos los derechos reservados.</footer>
+}

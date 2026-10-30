@@ -1,42 +1,258 @@
-<form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+<div class="login-screen">
+  <!-- Elementos decorativos de fondo -->
+  <div class="bg-stadium"></div>
+  <div class="bg-lights"></div>
+  <div class="bg-pitch-lines"></div>
+  <div class="corner-stripe top-left"></div>
+  <div class="corner-stripe bottom-right"></div>
   
-  <h2>S.I.F.U Login</h2>
-  
-  <div class="input-group">
-    <label for="username" class="sr-only">Usuario</label>
-    <input 
-      id="username"
-      type="text" 
-      placeholder="Usuario" 
-      [(ngModel)]="username" 
-      name="username"
-      required
-    >
+  <!-- Marca de agua de balón en Desktop (derecha) -->
+  <svg class="soccer-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="100" r="90" stroke="currentColor" stroke-width="6"/>
+    <circle cx="100" cy="100" r="78" stroke="currentColor" stroke-width="2" stroke-opacity="0.5"/>
+    <polygon points="100,62 136,88 122,130 78,130 64,88" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+    <line x1="100" y1="62" x2="100" y2="22" stroke="currentColor" stroke-width="4"/>
+    <line x1="136" y1="88" x2="174" y2="75" stroke="currentColor" stroke-width="4"/>
+    <line x1="122" y1="130" x2="146" y2="163" stroke="currentColor" stroke-width="4"/>
+    <line x1="78" y1="130" x2="54" y2="163" stroke="currentColor" stroke-width="4"/>
+    <line x1="64" y1="88" x2="26" y2="75" stroke="currentColor" stroke-width="4"/>
+    <polygon points="80,14 100,22 120,14 114,10 86,10" fill="currentColor" fill-opacity="0.3"/>
+    <polygon points="174,75 186,55 188,82 178,98" fill="currentColor" fill-opacity="0.3"/>
+    <polygon points="146,163 170,154 155,178 130,178" fill="currentColor" fill-opacity="0.3"/>
+    <polygon points="54,163 70,178 45,178 30,154" fill="currentColor" fill-opacity="0.3"/>
+    <polygon points="26,75 22,98 12,82 14,55" fill="currentColor" fill-opacity="0.3"/>
+  </svg>
+
+  <!-- Contenedor principal (Mobile: Columna | Desktop: 2 Columnas) -->
+  <div class="login-layout" [class.is-success]="loginSuccess()">
+    
+    <!-- SECCIÓN MARCA / LOGO -->
+    <section class="brand-section">
+      <div class="crest-wrapper">
+        <svg class="sifu-crest" viewBox="0 0 180 205" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escudo S.I.F.U. Football Manager">
+          <defs>
+            <linearGradient id="goldLime" x1="0" y1="0" x2="180" y2="205" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#d4f338"/>
+              <stop offset="50%" stop-color="#b4e329"/>
+              <stop offset="100%" stop-color="#76b82a"/>
+            </linearGradient>
+            <linearGradient id="shieldDark" x1="90" y1="36" x2="90" y2="195" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#0b2417"/>
+              <stop offset="100%" stop-color="#04110a"/>
+            </linearGradient>
+            <linearGradient id="stripeGreen" x1="90" y1="45" x2="90" y2="185" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#b8eb2c"/>
+              <stop offset="100%" stop-color="#3c8d2f"/>
+            </linearGradient>
+            <clipPath id="innerShieldClip">
+              <path d="M90 44 L152 64 C152 124 134 162 90 185 C46 162 28 124 28 64 Z"/>
+            </clipPath>
+          </defs>
+
+          <!-- Corona Superior -->
+          <path d="M68 28 L63 13 L79 20 L90 7 L101 20 L117 13 L112 28 Z" fill="url(#goldLime)"/>
+          <path d="M69 31 H111 C112.5 31 113.5 32 113.5 33.5 C113.5 35 112.5 36 111 36 H69 C67.5 36 66.5 35 66.5 33.5 C66.5 32 67.5 31 69 31 Z" fill="#9bd326"/>
+
+          <!-- Escudo Exterior (Borde Lima/Verde) -->
+          <path d="M90 36 L160 59 C160 126 140 169 90 195 C40 169 20 126 20 59 Z" fill="url(#goldLime)"/>
+          
+          <!-- Escudo Intermedio Oscuro -->
+          <path d="M90 41 L155 62 C155 125 136 164 90 189 C44 164 25 125 25 62 Z" fill="url(#shieldDark)"/>
+
+          <!-- Franjas Verticales Internas -->
+          <g clip-path="url(#innerShieldClip)">
+            <rect x="25" y="40" width="130" height="150" fill="#071910"/>
+            <!-- Franja Izquierda -->
+            <rect x="42" y="40" width="18" height="150" fill="url(#stripeGreen)"/>
+            <!-- Franja Central -->
+            <rect x="81" y="40" width="18" height="150" fill="url(#stripeGreen)" opacity="0.85"/>
+            <!-- Franja Derecha -->
+            <rect x="120" y="40" width="18" height="150" fill="url(#stripeGreen)"/>
+            <!-- Sombra diagonal sutil -->
+            <polygon points="25,40 155,40 60,190 25,190" fill="#ffffff" fill-opacity="0.04"/>
+          </g>
+
+          <!-- Filete Interno del Escudo -->
+          <path d="M90 45 L151 64.5 C151 123 133 160.5 90 184 C47 160.5 29 123 29 64.5 Z" stroke="#8ad128" stroke-width="2" stroke-opacity="0.6" fill="none"/>
+
+          <!-- Sombra detrás del balón -->
+          <circle cx="90" cy="96" r="39" fill="#04100a" fill-opacity="0.75"/>
+
+          <!-- Balón de Fútbol Clásico -->
+          <g transform="translate(90, 93)">
+            <circle cx="0" cy="0" r="35" fill="#f4f7f5" stroke="#081c11" stroke-width="3"/>
+            <!-- Sombreado 3D del balón -->
+            <path d="M 22 -27 A 35 35 0 0 1 -20 28 A 33 35 0 0 0 22 -27 Z" fill="#cfd8d3" opacity="0.5"/>
+            <!-- Pentágono central -->
+            <polygon points="0,-13 12,-4 8,10 -8,10 -12,-4" fill="#0c2015"/>
+            <!-- Costuras -->
+            <line x1="0" y1="-13" x2="0" y2="-27" stroke="#0c2015" stroke-width="2.5"/>
+            <line x1="12" y1="-4" x2="26" y2="-9" stroke="#0c2015" stroke-width="2.5"/>
+            <line x1="8" y1="10" x2="18" y2="23" stroke="#0c2015" stroke-width="2.5"/>
+            <line x1="-8" y1="10" x2="-18" y2="23" stroke="#0c2015" stroke-width="2.5"/>
+            <line x1="-12" y1="-4" x2="-26" y2="-9" stroke="#0c2015" stroke-width="2.5"/>
+            <!-- Pentágonos periféricos -->
+            <polygon points="-9,-33 0,-26 9,-33 5,-35 -5,-35" fill="#0c2015"/>
+            <polygon points="25,-9 32,-19 35,-6 31,4" fill="#0c2015"/>
+            <polygon points="17,22 29,20 23,30 10,32" fill="#0c2015"/>
+            <polygon points="-17,22 -10,32 -23,30 -29,20" fill="#0c2015"/>
+            <polygon points="-25,-9 -31,4 -35,-6 -32,-19" fill="#0c2015"/>
+          </g>
+        </svg>
+      </div>
+
+      <h1 class="brand-title">
+        S<span class="dot">.</span>I<span class="dot">.</span>F<span class="dot">.</span>U<span class="dot">.</span>
+      </h1>
+      <p class="brand-subtitle">FOOTBALL MANAGER</p>
+
+      <div class="brand-tagline-group">
+        <span class="brand-divider"></span>
+        <p class="brand-tagline">TU EQUIPO, TU HISTORIA</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN TARJETA (LOGIN FORM O BIENVENIDA) -->
+    <section class="card-section">
+      @if (!loginSuccess()) {
+        <div class="auth-card">
+          <div class="auth-card-header">
+            <h2>Iniciar Sesión</h2>
+            <p>Accedé a tu cuenta para continuar<br>con tu carrera en S.I.F.U.</p>
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
+            <!-- Campo Usuario -->
+            <div class="form-field">
+              <label for="username">Usuario</label>
+              <div class="input-box" [class.has-value]="username.length > 0" [class.input-error]="error()">
+                <span class="field-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M20 21a8 8 0 0 0-16 0"/>
+                  </svg>
+                </span>
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="Ingresá tu usuario"
+                  [(ngModel)]="username"
+                  (ngModelChange)="error.set(false)"
+                  name="username"
+                  autocomplete="username"
+                  required
+                >
+                @if (username.length > 0) {
+                  <button
+                    type="button"
+                    class="action-icon-btn clear-btn"
+                    (click)="clearUsername()"
+                    aria-label="Limpiar usuario"
+                    title="Limpiar usuario"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm4.3 13.3a.996.996 0 0 1-1.41 0L12 12.41 9.11 15.3a.996.996 0 1 1-1.41-1.41L10.59 11 7.7 8.11A.996.996 0 1 1 9.11 6.7L12 9.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 11l2.89 2.89c.38.38.38 1.02 0 1.41z"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div class="form-field">
+              <label for="password">Contraseña</label>
+              <div class="input-box" [class.has-value]="password.length > 0" [class.input-error]="error()">
+                <span class="field-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="11" width="16" height="10" rx="2" ry="2"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                    <circle cx="12" cy="16" r="1"/>
+                  </svg>
+                </span>
+                <input
+                  id="password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  placeholder="Ingresá tu contraseña"
+                  [(ngModel)]="password"
+                  (ngModelChange)="error.set(false)"
+                  name="password"
+                  autocomplete="current-password"
+                  required
+                >
+                <button
+                  type="button"
+                  class="action-icon-btn eye-btn"
+                  (click)="togglePassword()"
+                  [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  [title]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                >
+                  @if (!showPassword()) {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+
+            <!-- Mensaje de error -->
+            @if (error()) {
+              <div class="error-banner" role="alert">
+                <span>Usuario o contraseña incorrectos</span>
+              </div>
+            }
+
+            <!-- Botón Entrar -->
+            <button type="submit" class="btn-submit" [disabled]="isLoading()">
+              <span>{{ isLoading() ? 'Ingresando...' : 'Entrar' }}</span>
+              <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="13 6 19 12 13 18"/>
+              </svg>
+            </button>
+
+            <!-- Separador Registro -->
+            <div class="register-prompt">
+              <span class="line"></span>
+              <p class="prompt-text">
+                ¿No tenés una cuenta?
+                <button type="button" class="link-register" (click)="goToRegister()">Registrate</button>
+              </p>
+              <span class="line"></span>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <!-- Tarjeta de Bienvenida post-login -->
+        <div class="auth-card welcome-card">
+          <div class="check-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h2 class="welcome-heading">¡Bienvenido!</h2>
+          <p class="welcome-subtext">Ya estás dentro de tu club.</p>
+          <button type="button" class="btn-submit" (click)="continueToApp()">
+            <span>Continuar</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="13 6 19 12 13 18"/>
+            </svg>
+          </button>
+        </div>
+      }
+    </section>
+
   </div>
 
-  <div class="input-group">
-    <label for="password" class="sr-only">Contraseña</label>
-    <input 
-      id="password"
-      type="password" 
-      placeholder="Contraseña" 
-      [(ngModel)]="password" 
-      name="password"
-      required
-    >
-  </div>
-
-  @if (error) {
-    <p class="error">Usuario o contraseña incorrectos</p>
-  }
-
-  <div class="button-group">
-    <button type="submit" [disabled]="!loginForm.valid" class="btn-primary">
-      Entrar
-    </button>
-    <button type="button" (click)="goToRegister()" class="btn-secondary">
-      No tienes una cuenta? Registrate
-    </button>
-  </div>
-
-</form>
+  <!-- Footer -->
+  <footer class="login-footer">
+    <p>&copy; 2025 S.I.F.U. Football Manager. <span class="footer-break">Todos los derechos reservados.</span></p>
+  </footer>
+</div>

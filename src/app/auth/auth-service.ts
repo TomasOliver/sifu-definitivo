@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Users } from '../models/users';
 import { Observable, from, map, switchMap, throwError } from 'rxjs';
-import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, limit, query, setDoc, where } from 'firebase/firestore';
 import { firestoreDb } from '../firebase.config';
 
 @Injectable({
@@ -15,7 +15,7 @@ export class AuthService {
   constructor() { }
 
   login(username: string, password: string): Observable<Users | null> {
-    const q = query(this.usersCol, where('username', '==', username));
+    const q = query(this.usersCol, where('username', '==', username), limit(1));
     return from(getDocs(q)).pipe(
       map(snapshot => {
         const users = snapshot.docs

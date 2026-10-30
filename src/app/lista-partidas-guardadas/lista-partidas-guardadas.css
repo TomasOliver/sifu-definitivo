@@ -1,12 +1,16 @@
-
 .saves-container {
-  max-width: 1000px;
+  max-width: 1050px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #f0f7f4; 
+  padding: 2rem 1.5rem;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #f4f7f5;
+  animation: fadeIn 0.4s ease-out;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .saves-header {
   display: flex;
@@ -15,158 +19,179 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #cddc39; 
-  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(94, 152, 108, 0.35);
+  padding-bottom: 1.15rem;
 }
 
 .saves-header h1 {
-  color: #f0f7f4; 
+  font-family: 'Orbitron', 'Inter', sans-serif;
+  color: #ffffff;
   margin: 0;
   font-size: clamp(1.4rem, 1rem + 2vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
 }
 
 .btn-back {
-  color: #cddc39; 
+  color: #b4e629;
   text-decoration: none;
-  font-weight: bold;
-  border: 1px solid #cddc39;
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: all 0.3s;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(180, 230, 41, 0.45);
+  background: rgba(8, 28, 18, 0.72);
+  padding: 9px 18px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
 }
 
 .btn-back:hover {
-  background-color: #cddc39;
-  color: #1e392a; 
+  background-color: #b4e629;
+  color: #081c0f;
+  box-shadow: 0 0 18px rgba(180, 230, 41, 0.3);
 }
-
 
 .saves-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 1.5rem;
 }
 
-
 .save-card {
-  background-color: #f0f7f4; 
-  color: #1e392a; 
-  border: 2px solid #cddc39; 
-  border-radius: 12px;
+  background: rgba(8, 28, 18, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #f4f7f5;
+  border: 1px solid rgba(94, 152, 108, 0.3);
+  border-top: 3px solid #b4e629;
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease;
+  box-shadow:
+    0 16px 35px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .save-card:hover {
-  transform: translateY(-5px);
-  border-color: #38a169; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  border-color: rgba(180, 230, 41, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55), 0 0 22px rgba(180, 230, 41, 0.14);
 }
-
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .mini-logo {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
 }
 
 .save-info h2 {
   margin: 0;
   font-size: 1.2rem;
-  color: #1e392a;
+  color: #ffffff;
   font-weight: 800;
 }
 
 .team-name {
   margin: 5px 0 0 0;
-  font-size: 0.95rem;
-  color: #555;
+  font-size: 0.9rem;
+  color: rgba(208, 226, 214, 0.78);
 }
 
+.team-name strong {
+  color: #b4e629;
+}
 
 .card-dates {
-  background-color: rgba(205, 220, 57, 0.2); 
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
+  background-color: rgba(5, 18, 11, 0.65);
+  border: 1px solid rgba(94, 152, 108, 0.22);
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 1.35rem;
 }
 
 .card-dates p {
-  margin: 3px 0;
-  font-size: 0.85rem;
-  color: #444;
+  margin: 4px 0;
+  font-size: 0.82rem;
+  color: rgba(190, 214, 198, 0.75);
 }
-
 
 .btn-continue {
   width: 100%;
   padding: 12px;
-  background-color: #38a169; 
-  color: white;
+  background: linear-gradient(90deg, #b4e629 0%, #c4f035 50%, #aee226 100%);
+  color: #081c0f;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
   cursor: pointer;
   text-transform: uppercase;
-  transition: background 0.2s;
+  box-shadow: 0 6px 18px rgba(172, 228, 38, 0.22);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .btn-continue:hover {
-  background-color: #2f855a; 
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(180, 236, 45, 0.35);
 }
-
 
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 3rem;
-  background-color: rgba(255,255,255,0.1);
-  border-radius: 12px;
-  color: #ccc;
+  padding: 3.5rem 2rem;
+  background: rgba(8, 28, 18, 0.75);
+  border: 1px dashed rgba(94, 152, 108, 0.38);
+  border-radius: 16px;
+  color: rgba(208, 226, 214, 0.72);
 }
 
 .btn-new {
   display: inline-block;
   margin-top: 1rem;
   padding: 10px 20px;
-  background-color: #cddc39;
-  color: #1e392a;
+  background: #b4e629;
+  color: #081c0f;
   text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 10px;
+  font-weight: 700;
 }
-
 
 .btn-delete {
   width: 100%;
   margin-top: 10px;
   padding: 0.7rem;
-  background: rgba(255, 80, 80, 0.15); 
-  border-left: 5px solid #ff5252;
+  background: rgba(229, 62, 62, 0.12);
+  border: 1px solid rgba(239, 83, 80, 0.4);
+  border-left: 4px solid #ff5252;
   color: #ff8a80;
+  font-family: inherit;
   font-weight: 700;
+  font-size: 0.85rem;
   text-transform: uppercase;
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .btn-delete:hover {
-  background: #ff5252;
-  color: #15291f;
-  border-left: 10px solid #ff8a80;
-  transform: translateX(5px);
+  background: #e53e3e;
+  color: #ffffff;
+  border-color: #e53e3e;
 }
 
 @media (max-width: 600px) {

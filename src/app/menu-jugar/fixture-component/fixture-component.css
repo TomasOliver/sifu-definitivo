@@ -1,50 +1,52 @@
 .game-navbar {
-  background-color: #15291f; 
-  padding: 1rem 2rem;
+  background: rgba(5, 20, 12, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 0.9rem 2rem;
   display: flex;
   align-items: center;
   gap: 2rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  border-bottom: 2px solid #cddc39; 
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+  border-bottom: 2px solid #b4e629;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .nav-brand span {
+  font-family: 'Orbitron', 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 1.2rem;
-  color: #cddc39;
-  letter-spacing: 1px;
+  font-size: 1.25rem;
+  color: #b4e629;
+  letter-spacing: 0.08em;
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
-  color: #fff;
+  color: rgba(235, 245, 238, 0.85);
   text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .nav-links a:hover {
-  background-color: rgba(205, 220, 57, 0.1);
-  color: #cddc39;
+  background-color: rgba(180, 230, 41, 0.12);
+  color: #b4e629;
 }
 
 .nav-links a.active {
-  background-color: #cddc39;
-  color: #15291f;
-  font-weight: bold;
-}
-
-.nav-links a.active {
-  background-color: #cddc39;
-  color: #15291f; 
-  font-weight: bold;
+  background: linear-gradient(90deg, #b4e629 0%, #c4f035 50%, #aee226 100%);
+  color: #081c0f;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(172, 228, 38, 0.25);
 }
 
 .nav-spacer {
@@ -52,84 +54,107 @@
 }
 
 .toolbar {
-  margin: 2rem; 
+  max-width: 920px;
+  margin: 1.5rem auto 0 auto;
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
 }
 
-
 .btn-volver {
-  background-color: transparent; 
-  border: 2px solid rgba(205, 220, 57, 0.3); 
-  border-radius: 50px; 
-  padding: 8px 20px;
-  color: #cddc39; 
-  font-size: 0.95rem;
+  background: rgba(8, 28, 18, 0.78);
+  border: 1px solid rgba(180, 230, 41, 0.42);
+  border-radius: 999px;
+  padding: 9px 18px;
+  color: #b4e629;
+  font-family: inherit;
+  font-size: 0.88rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  display: flex;
+  letter-spacing: 0.04em;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background: #b4e629;
+  color: #081c0f;
+  box-shadow: 0 0 18px rgba(180, 230, 41, 0.3);
 }
 
 .arrow {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   line-height: 1;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
+}
+
+.btn-volver:hover .arrow {
+  transform: translateX(-3px);
 }
 
 .fixture-container {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 2rem;
-  color: white;
-  animation: fadeIn 0.5s ease-out;
+  padding: 1.5rem 1.5rem 2.5rem;
+  color: #f4f7f5;
+  animation: fadeIn 0.45s ease-out;
 }
 
 .page-header h2 {
+  font-family: 'Orbitron', 'Inter', sans-serif;
   text-align: center;
-  color: #cddc39;
+  color: #ffffff;
+  font-size: clamp(1.5rem, 1.1rem + 2vw, 2.1rem);
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.05em;
+  margin-top: 0;
   margin-bottom: 2rem;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
 }
 
-
 .matchday-card {
-  background-color: #f0f7f4;
-  border-radius: 12px;
-  overflow: hidden; 
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  color: #1e392a; 
+  background: rgba(8, 28, 18, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(94, 152, 108, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.45);
+  color: #f4f7f5;
 }
 
 .matchday-header {
-  background-color: #1e392a; 
-  color: white;
-  padding: 10px 20px;
-  border-bottom: 3px solid #cddc39;
+  background: rgba(4, 15, 9, 0.92);
+  color: #b4e629;
+  padding: 12px 20px;
+  border-bottom: 2px solid #b4e629;
 }
 
 .matchday-header h3 {
+  font-family: 'Orbitron', 'Inter', sans-serif;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .matches-list {
-  padding: 10px 0;
+  padding: 6px 0;
 }
 
 .match-row {
   display: grid;
-  grid-template-columns: 1fr 100px 1fr; 
+  grid-template-columns: 1fr 110px 1fr;
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 1px solid #e0e0e0;
-  transition: background 0.2s;
+  border-bottom: 1px solid rgba(94, 152, 108, 0.16);
+  transition: background 0.18s ease;
 }
 
 .match-row:last-child {
@@ -137,61 +162,68 @@
 }
 
 .match-row:hover {
-  background-color: rgba(0,0,0,0.03);
+  background-color: rgba(180, 230, 41, 0.07);
 }
 
 .team {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.96rem;
+  color: #e9f2ec;
 }
 
 .team.home {
-  text-align: right; 
-  padding-right: 10px;
+  text-align: right;
+  padding-right: 12px;
 }
 
 .team.away {
-  text-align: left; 
-  padding-left: 10px;
+  text-align: left;
+  padding-left: 12px;
 }
 
 .score-box {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  font-size: 1.2rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  background: rgba(4, 15, 9, 0.75);
+  border: 1px solid rgba(94, 152, 108, 0.28);
+  border-radius: 8px;
+  padding: 5px 10px;
 }
 
 .vs-badge {
-  background-color: #e0e0e0;
-  color: #777;
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  border-radius: 4px;
+  color: rgba(182, 208, 190, 0.72);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.match-row.played .score-box {
+  border-color: rgba(180, 230, 41, 0.45);
 }
 
 .match-row.played .score-number {
-  color: #1e392a;
+  color: #b4e629;
 }
+
 .match-row.played .divider {
-  margin: 0 5px;
-  color: #999;
+  margin: 0 6px;
+  color: rgba(208, 226, 214, 0.55);
 }
 
 .no-matches {
   text-align: center;
   padding: 20px;
   font-style: italic;
-  color: #777;
+  color: rgba(208, 226, 214, 0.65);
 }
-
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 
 @media (max-width: 768px) {
   .game-navbar {
@@ -203,16 +235,17 @@
   .nav-links {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .nav-links a {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+    padding: 0.4rem 0.7rem;
   }
 
   .toolbar {
-    margin: 1rem;
+    padding: 0 1rem;
+    margin-top: 1rem;
   }
 
   .fixture-container {
@@ -222,13 +255,13 @@
 
 @media (max-width: 600px) {
   .match-row {
-    grid-template-columns: 1fr 64px 1fr; /* Reducir espacio central */
+    grid-template-columns: 1fr 74px 1fr;
     font-size: 0.85rem;
     padding: 10px 12px;
   }
 
   .team {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     word-break: break-word;
   }
 }

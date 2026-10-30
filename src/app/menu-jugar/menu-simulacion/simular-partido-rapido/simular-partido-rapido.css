@@ -1,42 +1,46 @@
 .simulacion-rapida-container {
-  max-width: 1000px; 
-  margin: 0 auto; 
-  padding: 2rem;
-  color: #ecf0f1;
-  font-family: 'Roboto', sans-serif;
-  animation: fadeIn 0.5s ease-out;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2.5rem;
+  color: #f4f7f5;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  animation: fadeIn 0.45s ease-out;
 }
 
 .toolbar {
-  margin: 2rem;
+  max-width: 1050px;
+  margin: 1.5rem auto 0 auto;
+  padding: 0 1.5rem;
 }
 
 button {
-  background: transparent;
-  border: 2px solid #cddc39;
-  color: #cddc39;
-  padding: 8px 20px;
-  border-radius: 50px;
+  background: rgba(8, 28, 18, 0.78);
+  border: 1px solid rgba(180, 230, 41, 0.42);
+  color: #b4e629;
+  padding: 9px 18px;
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
-  display: flex;
+  font-family: inherit;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
 }
 
 button:hover {
-  background: rgba(205, 220, 57, 0.1);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(205, 220, 57, 0.3);
+  background: #b4e629;
+  color: #081c0f;
+  box-shadow: 0 0 18px rgba(180, 230, 41, 0.3);
 }
 
-button.arrow {
-  font-size: 1.2rem;
+button .arrow {
+  font-size: 1.1rem;
   line-height: 1;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 
 button:hover .arrow {
@@ -44,12 +48,15 @@ button:hover .arrow {
 }
 
 .match-header {
-  background: linear-gradient(180deg, #1e392a 0%, #15291f 100%);
-  border-bottom: 3px solid #cddc39;
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: rgba(8, 28, 18, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(94, 152, 108, 0.35);
+  border-bottom: 4px solid #b4e629;
+  padding: 1.75rem 1.5rem;
+  border-radius: 18px;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
 
@@ -59,57 +66,63 @@ button:hover .arrow {
   align-items: center;
   gap: 2rem;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 800;
 }
 
 .team-name {
+  font-family: 'Orbitron', 'Inter', sans-serif;
   flex: 1;
   text-align: center;
-  color: #fff;
-  font-size: 1.4rem;
+  color: #ffffff;
+  font-size: clamp(1.1rem, 1rem + 1vw, 1.45rem);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.04em;
 }
 
 .score-box {
-  background-color: #000;
-  color: #cddc39; 
-  padding: 10px 25px;
-  border-radius: 8px;
-  font-size: 2.5rem;
-  font-family: 'Courier New', monospace;
+  font-family: 'Orbitron', 'Inter', sans-serif;
+  background-color: rgba(4, 15, 9, 0.9);
+  color: #b4e629;
+  padding: 10px 26px;
+  border-radius: 12px;
+  font-size: 2.35rem;
   font-weight: 900;
-  letter-spacing: 5px;
-  border: 2px solid #3a5f4a;
-  min-width: 120px;
+  letter-spacing: 3px;
+  border: 1px solid rgba(180, 230, 41, 0.45);
+  min-width: 140px;
   text-align: center;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .contenedor-eventos {
   display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: 2rem; 
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
 }
 
-
 .columna {
-  background: rgba(255, 255, 255, 0.95); 
+  background: rgba(8, 28, 18, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  min-height: 300px; 
-  border-top: 5px solid transparent; 
+  border-radius: 16px;
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.45);
+  min-height: 300px;
+  border: 1px solid rgba(94, 152, 108, 0.3);
+  border-top: 4px solid #b4e629;
 }
 
 .titulo-equipo {
+  font-family: 'Orbitron', 'Inter', sans-serif;
   text-align: center;
   margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-size: 1.1rem;
+  margin-bottom: 1.35rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  color: #333;
+  color: #b4e629;
   text-transform: uppercase;
-  border-bottom: 1px solid #ddd;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(94, 152, 108, 0.28);
   padding-bottom: 10px;
 }
 
@@ -117,63 +130,90 @@ button:hover .arrow {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 11px 14px;
   margin-bottom: 10px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  transition: transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  background: rgba(4, 15, 9, 0.65);
+  border: 1px solid rgba(94, 152, 108, 0.2);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .evento:hover {
-  transform: translateX(5px);
-  border-color: #ccc;
+  transform: translateX(4px);
+  border-color: rgba(180, 230, 41, 0.45);
 }
 
-
 .minuto {
-  font-weight: 900;
-  font-size: 0.9rem;
-  color: #555;
-  min-width: 30px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #b4e629;
+  min-width: 32px;
   text-align: right;
 }
 
 .texto {
-  font-size: 0.95rem;
-  color: #333;
+  flex: 1;
+  font-size: 0.92rem;
+  color: #f4f7f5;
   line-height: 1.4;
 }
 
 .asist {
-  color: #777;
-  font-size: 0.85rem;
+  color: rgba(182, 208, 190, 0.72);
+  font-size: 0.82rem;
   font-style: italic;
+  margin-left: 4px;
 }
-
 
 .col-home {
-  border-top-color: #2e7d32; 
+  border-top-color: #b4e629;
 }
-.evento.home {
-  border-left: 4px solid #2e7d32;
-}
-.evento.home .minuto { color: #2e7d32; }
 
+.evento.home {
+  border-left: 4px solid #b4e629;
+}
+
+.evento.home .minuto {
+  color: #b4e629;
+}
 
 .col-away {
-  border-top-color: #d32f2f; 
+  border-top-color: #6bc449;
 }
-.evento.away {
-  border-left: 4px solid #d32f2f;
-}
-.evento.away .minuto { color: #d32f2f; }
 
+.evento.away {
+  border-left: 4px solid #6bc449;
+}
+
+.evento.away .minuto {
+  color: #8ee05e;
+}
+
+.event-icon {
+  font-size: 1.15rem;
+  min-width: 28px;
+  text-align: center;
+}
+
+.evento.goal {
+  background: rgba(180, 230, 41, 0.14);
+  border-color: rgba(180, 230, 41, 0.45);
+}
+
+.evento.goal strong {
+  color: #b4e629;
+}
+
+.evento.red-card {
+  background: rgba(229, 62, 62, 0.15);
+  border-color: rgba(239, 83, 80, 0.45);
+  border-left-color: #ff5252;
+}
 
 @media (max-width: 768px) {
   .toolbar {
-    margin: 1rem;
+    padding: 0 1rem;
+    margin-top: 1rem;
   }
 
   .simulacion-rapida-container {
@@ -181,45 +221,19 @@ button:hover .arrow {
   }
 
   .contenedor-eventos {
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;
     gap: 1.25rem;
   }
-  
+
   .marcador {
-    flex-direction: column; 
+    flex-direction: column;
     gap: 10px;
   }
-  
+
   .score-box {
-    font-size: 2rem;
-    padding: 5px 20px;
+    font-size: 1.9rem;
+    padding: 6px 20px;
   }
-  
-  .team-name { font-size: 1.2rem; }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-
-.event-icon {
-  font-size: 1.2rem; 
-  min-width: 30px;   
-  text-align: center;
-  margin-right: 8px;
-}
-
-
-.texto {
-  flex: 1; 
-}
-
-
-.evento.goal {
-  background-color: rgba(205, 220, 57, 0.2); 
-  border-color: #cddc39;
-}
-
-.evento.red-card {
-  background-color: rgba(244, 67, 54, 0.1); 
-  border-color: #f44336;
-}

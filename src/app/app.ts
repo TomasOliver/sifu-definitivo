@@ -17,6 +17,10 @@ export class App {
 
   private currentUrl = signal<string>('');
 
+  readonly isLoginPage = computed(() => {
+    return this.currentUrl() === '/login';
+  });
+
   readonly isAuthPage = computed(() => {
     const url = this.currentUrl();
     return url === '/login' || url === '/register';

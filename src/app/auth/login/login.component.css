@@ -1,100 +1,683 @@
-
 :host {
-  display: block; 
-  background-color: #c4e6d3; 
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  display: block;
   width: 100%;
-  max-width: 400px; 
+  min-height: 100dvh;
+  font-family: 'Inter', 'Roboto', sans-serif;
 }
 
-form {
+.login-screen {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  background-color: #06180e;
+  color: #f4f7f5;
+  padding: 2rem 1.25rem 1.25rem;
+  isolation: isolate;
 }
 
-h2 {
+/* ==========================================
+   ELEMENTOS ATMOSFÉRICOS Y DE FONDO (ESTADIO)
+   ========================================== */
+.bg-stadium {
+  position: absolute;
+  inset: 0;
+  z-index: -4;
+  background:
+    /* Cielo nocturno del estadio arriba y césped iluminado abajo */
+    radial-gradient(ellipse 90% 45% at 50% 100%, rgba(36, 98, 46, 0.55) 0%, rgba(12, 42, 23, 0.85) 55%, #04120a 100%),
+    linear-gradient(180deg, #041109 0%, #071f12 48%, #0d321c 78%, #154525 100%);
+}
+
+/* Textura sutil de franjas de césped en la mitad inferior */
+.bg-stadium::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 45px,
+      rgba(0, 0, 0, 0.04) 45px,
+      rgba(0, 0, 0, 0.04) 90px
+    ),
+    radial-gradient(circle at 50% 110%, rgba(154, 219, 36, 0.14), transparent 70%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
+}
+
+/* Reflectores del estadio (izquierda y derecha) */
+.bg-lights {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 22% at 6% 24%, rgba(215, 250, 195, 0.22) 0%, rgba(132, 210, 85, 0.08) 45%, transparent 75%),
+    radial-gradient(ellipse 38% 22% at 94% 24%, rgba(215, 250, 195, 0.18) 0%, rgba(132, 210, 85, 0.06) 45%, transparent 75%),
+    radial-gradient(circle at 50% 28%, rgba(42, 118, 66, 0.22) 0%, transparent 60%);
+}
+
+/* Líneas de cal del campo de juego en perspectiva */
+.bg-pitch-lines {
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  transform: translateX(-50%);
+  width: 130vw;
+  max-width: 1400px;
+  height: 420px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.03);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.bg-pitch-lines::before {
+  content: '';
+  position: absolute;
+  top: 22%;
+  left: -15%;
+  right: -15%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(255, 255, 255, 0.07) 30%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.07) 70%,
+    transparent 95%
+  );
+  transform: rotate(-3deg);
+}
+
+/* Franjas diagonales lima en las esquinas */
+.corner-stripe {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.corner-stripe.top-left {
+  top: -36px;
+  left: -76px;
+  width: 220px;
+  height: 85px;
+  transform: rotate(-45deg);
+  background: linear-gradient(
+    180deg,
+    #8fc924 0%,
+    #8fc924 44%,
+    transparent 44%,
+    transparent 62%,
+    #a8e028 62%,
+    #a8e028 82%,
+    transparent 82%
+  );
+  opacity: 0.88;
+}
+
+.corner-stripe.bottom-right {
+  bottom: -36px;
+  right: -76px;
+  width: 220px;
+  height: 85px;
+  transform: rotate(-45deg);
+  background: linear-gradient(
+    180deg,
+    transparent 18%,
+    #a8e028 18%,
+    #a8e028 38%,
+    transparent 38%,
+    transparent 56%,
+    #8fc924 56%,
+    #8fc924 100%
+  );
+  opacity: 0.88;
+}
+
+/* Marca de agua del balón a la derecha (visible en Desktop) */
+.soccer-watermark {
+  display: none;
+  position: absolute;
+  right: -135px;
+  top: 46%;
+  transform: translateY(-50%);
+  width: 520px;
+  height: 520px;
+  color: rgba(130, 195, 130, 0.11);
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* ==========================================
+   LAYOUT PRINCIPAL (MOBILE FIRST)
+   ========================================== */
+.login-layout {
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  z-index: 1;
+}
+
+/* ==========================================
+   SECCIÓN DE MARCA (ESCUDO + TÍTULO)
+   ========================================== */
+.brand-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  font-weight: 700;
+  user-select: none;
 }
 
-.input-group {
-  margin-bottom: 1rem;
+.crest-wrapper {
+  width: 112px;
+  height: 126px;
+  margin-bottom: 0.35rem;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 18px rgba(178, 232, 44, 0.16));
+  transition: transform 0.3s ease;
 }
 
-input[type="text"],
-input[type="password"] {
+.sifu-crest {
   width: 100%;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 1rem;
+  height: 100%;
+  display: block;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
-  outline: none;
-  border-color: #38a169; 
+.brand-title {
+  font-family: 'Orbitron', 'Inter', sans-serif;
+  font-size: 2.55rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
 
-.button-group {
+.brand-title .dot {
+  color: #9fe029;
+  margin: 0 1px;
+}
+
+.brand-subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  color: #b4ec2f;
+  text-transform: uppercase;
+}
+
+.brand-tagline-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 1rem;
+  align-items: center;
+  margin-top: 0.65rem;
 }
 
-button {
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+.brand-divider {
+  width: 34px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: rgba(164, 224, 48, 0.5);
+  margin-bottom: 0.65rem;
+}
+
+.brand-tagline {
+  margin: 0;
+  font-size: 0.72rem;
   font-weight: 500;
+  letter-spacing: 0.26em;
+  color: rgba(230, 242, 234, 0.82);
+  text-transform: uppercase;
+}
+
+/* ==========================================
+   TARJETA DE LOGIN / BIENVENIDA
+   ========================================== */
+.card-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  background: rgba(8, 28, 18, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(94, 152, 108, 0.28);
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: cardAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-card-header {
+  margin-bottom: 1.35rem;
+}
+
+.auth-card-header h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.auth-card-header p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(208, 226, 214, 0.76);
+}
+
+/* ==========================================
+   CAMPOS DEL FORMULARIO
+   ========================================== */
+.form-field {
+  margin-bottom: 1.05rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.42rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e4efe8;
+  letter-spacing: 0.01em;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  background-color: rgba(6, 21, 13, 0.78);
+  border: 1px solid rgba(92, 142, 106, 0.38);
+  border-radius: 10px;
+  padding: 0 0.8rem;
+  height: 46px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.input-box:focus-within {
+  border-color: #6bc449;
+  background-color: rgba(9, 30, 19, 0.92);
+  box-shadow: 0 0 0 2px rgba(132, 212, 42, 0.16);
+}
+
+.input-box.has-value {
+  border-color: rgba(110, 180, 108, 0.52);
+}
+
+.input-box.input-error {
+  border-color: rgba(239, 83, 80, 0.75);
+}
+
+.field-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: rgba(182, 208, 190, 0.72);
+  margin-right: 0.65rem;
+  flex-shrink: 0;
+}
+
+.field-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.input-box:focus-within .field-icon {
+  color: #a8e62e;
+}
+
+.input-box input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f2f7f4;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.input-box input::placeholder {
+  color: rgba(168, 194, 177, 0.52);
+}
+
+/* Evitar fondo blanco del autocompletado del navegador */
+.input-box input:-webkit-autofill,
+.input-box input:-webkit-autofill:hover,
+.input-box input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f2f7f4;
+  -webkit-box-shadow: 0 0 0px 1000px #081e12 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.action-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  margin-left: 0.35rem;
+  color: rgba(182, 208, 190, 0.68);
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  border-radius: 50%;
+  transition: color 0.18s ease, transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.action-icon-btn:hover {
+  color: #ffffff;
+}
+
+.clear-btn svg {
+  width: 17px;
+  height: 17px;
+  opacity: 0.85;
+}
+
+.eye-btn svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* ==========================================
+   ERROR BANNER
+   ========================================== */
+.error-banner {
+  background-color: rgba(229, 62, 62, 0.14);
+  border: 1px solid rgba(239, 83, 80, 0.55);
+  color: #ff9494;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
   text-align: center;
+  margin-bottom: 0.95rem;
 }
 
-.btn-primary {
-  background-color: #38a169;
-  color: white;
+/* ==========================================
+   BOTÓN PRINCIPAL (ENTRAR / CONTINUAR)
+   ========================================== */
+.btn-submit {
+  width: 100%;
+  height: 46px;
+  margin-top: 0.35rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b4e629 0%, #c4f035 50%, #aee226 100%);
+  color: #081c0f;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(172, 228, 38, 0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #2f855a; 
-  transform: translateY(-2px);
+.btn-submit:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(180, 236, 45, 0.35);
 }
 
-.btn-primary:disabled {
-  background-color: #9db2a2;
-  color: #f0f7f4;
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: #38a169;
-  border: 2px solid #38a169;
+.arrow-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
 }
 
-.btn-secondary:hover {
-  background-color: rgba(56, 161, 105, 0.1);
+.btn-submit:hover:not(:disabled) .arrow-icon {
+  transform: translateX(3px);
 }
 
-.error {
-  color: #e53e3e;
-  background-color: rgba(229, 62, 62, 0.1);
-  border: 1px solid #e53e3e;
-  border-radius: 8px;
-  padding: 10px;
+/* ==========================================
+   SECCIÓN REGISTRO (SEPARADOR CON LÍNEAS)
+   ========================================== */
+.register-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.register-prompt .line {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(132, 178, 146, 0.22);
+}
+
+.prompt-text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(210, 226, 215, 0.78);
+  white-space: nowrap;
+}
+
+.link-register {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 0.2rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #bae82e;
+  cursor: pointer;
+  transition: color 0.18s ease, text-decoration 0.18s ease;
+}
+
+.link-register:hover {
+  color: #d0f848;
+  text-decoration: underline;
+}
+
+/* ==========================================
+   ESTADO DE BIENVENIDA (¡BIENVENIDO!)
+   ========================================== */
+.welcome-card {
   text-align: center;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  padding: 2rem 1.5rem 1.75rem;
 }
 
-@media (max-width: 480px) {
-  :host {
-    padding: 1.5rem 1.25rem;
+.check-circle {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  border: 2px solid #b4e629;
+  background: rgba(180, 230, 41, 0.08);
+  color: #c2f034;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(180, 230, 41, 0.18);
+}
+
+.check-circle svg {
+  width: 24px;
+  height: 24px;
+}
+
+.welcome-heading {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.welcome-subtext {
+  margin: 0 0 1.35rem;
+  font-size: 0.86rem;
+  color: rgba(208, 226, 214, 0.78);
+}
+
+/* En mobile cuando aparece la tarjeta "¡Bienvenido!" el diseño compacta sutilmente el logo */
+@media (max-width: 899px) {
+  .login-layout.is-success .brand-tagline-group {
+    display: none;
+  }
+
+  .login-layout.is-success .crest-wrapper {
+    width: 96px;
+    height: 108px;
+  }
+
+  .login-layout.is-success .brand-title {
+    font-size: 2.15rem;
+  }
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+.login-footer {
+  width: 100%;
+  text-align: center;
+  padding-top: 1.25rem;
+  z-index: 1;
+}
+
+.login-footer p {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: rgba(200, 220, 206, 0.62);
+}
+
+.footer-break {
+  display: block;
+}
+
+/* ==========================================
+   VERSIÓN ORDENADOR / DESKTOP (>= 900px)
+   ========================================== */
+@media (min-width: 900px) {
+  .login-screen {
+    padding: 2.5rem 4rem 1.5rem;
+  }
+
+  .soccer-watermark {
+    display: block;
+  }
+
+  .corner-stripe.top-left {
+    top: -30px;
+    left: -82px;
+    width: 260px;
+    height: 95px;
+  }
+
+  .corner-stripe.bottom-right {
+    bottom: -30px;
+    right: -82px;
+    width: 260px;
+    height: 95px;
+  }
+
+  .login-layout {
+    max-width: 1020px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5.5rem;
+  }
+
+  .brand-section {
+    flex: 0 1 auto;
+    min-width: 300px;
+  }
+
+  .crest-wrapper {
+    width: 148px;
+    height: 168px;
+    margin-bottom: 0.5rem;
+  }
+
+  .brand-title {
+    font-size: 3.5rem;
+  }
+
+  .brand-subtitle {
+    font-size: 1.05rem;
+    letter-spacing: 0.21em;
+    margin-top: 0.3rem;
+  }
+
+  .brand-tagline-group {
+    margin-top: 0.9rem;
+  }
+
+  .brand-divider {
+    width: 44px;
+    margin-bottom: 0.85rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.82rem;
+    letter-spacing: 0.28em;
+  }
+
+  .card-section {
+    width: 410px;
+    flex-shrink: 0;
+  }
+
+  .auth-card {
+    padding: 2.35rem 2.1rem;
+    border-radius: 16px;
+  }
+
+  .footer-break {
+    display: inline;
   }
 }
