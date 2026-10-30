@@ -118,6 +118,7 @@
               <span class="meta-chip rank">#{{ detail.position }} en la Liga</span>
               @if (detail.standing) {
                 <span class="meta-chip">{{ detail.standing.points }} PTS ({{ detail.standing.wins }}G - {{ detail.standing.draws }}E - {{ detail.standing.losses }}P)</span>
+                <span class="meta-chip">GF: {{ detail.standing.goalsFor }} · GC: {{ detail.standing.goalsAgainst }}</span>
               }
               <span class="meta-chip">Media Titulares: {{ detail.avgRating }}</span>
             </div>
@@ -151,7 +152,7 @@
                   <div class="jersey-icon">
                     <span class="token-rating">{{ p.rating }}</span>
                   </div>
-                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                  <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
                 </div>
               }
             </div>
@@ -163,7 +164,7 @@
                   <div class="jersey-icon">
                     <span class="token-rating">{{ p.rating }}</span>
                   </div>
-                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                  <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
                 </div>
               }
             </div>
@@ -175,7 +176,7 @@
                   <div class="jersey-icon">
                     <span class="token-rating">{{ p.rating }}</span>
                   </div>
-                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                  <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
                 </div>
               }
             </div>
@@ -187,7 +188,7 @@
                   <div class="jersey-icon">
                     <span class="token-rating">{{ p.rating }}</span>
                   </div>
-                  <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+                  <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
                 </div>
               }
             </div>
@@ -195,23 +196,23 @@
             <div class="penalty-area-bottom"></div>
           </div>
 
-          <!-- Resumen rápido de totales del equipo debajo de la cancha -->
-          <div class="team-totals-strip">
+          <!-- Resumen rápido de totales acumulados por los jugadores actuales del plantel -->
+          <div class="team-totals-strip" title="Estadísticas acumuladas por los jugadores actuales del plantel">
             <div class="total-stat-box">
               <span class="t-val">⚽ {{ detail.totals.goals }}</span>
-              <span class="t-lbl">Goles</span>
+              <span class="t-lbl">Goles Plantel</span>
             </div>
             <div class="total-stat-box">
               <span class="t-val">👟 {{ detail.totals.assists }}</span>
-              <span class="t-lbl">Asistencias</span>
+              <span class="t-lbl">Asist. Plantel</span>
             </div>
             <div class="total-stat-box">
               <span class="t-val">🟨 {{ detail.totals.yellows }}</span>
-              <span class="t-lbl">Amarillas</span>
+              <span class="t-lbl">Amar. Plantel</span>
             </div>
             <div class="total-stat-box">
               <span class="t-val">🟥 {{ detail.totals.reds }}</span>
-              <span class="t-lbl">Rojas</span>
+              <span class="t-lbl">Rojas Plantel</span>
             </div>
           </div>
         </div>
@@ -220,7 +221,7 @@
         <div class="players-stats-column">
           <div class="column-box-header">
             <span class="box-title">Estadísticas del Plantel ({{ detail.orderedSquad.length }} jugadores)</span>
-            <span class="legend-inline">11 Titulares · {{ detail.substitutes.length }} Suplentes</span>
+            <span class="legend-inline">{{ detail.starters.length }} Titulares · {{ detail.substitutes.length }} Suplentes</span>
           </div>
 
           <div class="players-table-scroll">

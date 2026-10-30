@@ -36,7 +36,9 @@
                 <div class="team-actions">
                     <button class="btn-secondary" (click)="navigateToPlantel(equipo.id)">Ver Plantel</button>
                     @if (saveName) {
-                        <button class="btn-primary" (click)="onTeamClick(equipo)">Seleccionar</button>
+                        <button class="btn-primary" [disabled]="isCreatingSave()" (click)="onTeamClick(equipo)">
+                            {{ isCreatingSave() ? 'Creando...' : 'Seleccionar' }}
+                        </button>
                     }
                 </div>
             </div>

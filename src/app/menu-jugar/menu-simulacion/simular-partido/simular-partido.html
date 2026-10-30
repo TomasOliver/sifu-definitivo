@@ -62,13 +62,13 @@
               }
           } 
           @else if (e.type === 'yellow') {
-            Tarjeta Amarilla para {{ getPlayerName(getTeamById(e.teamId), e.playerId) }}
+            Tarjeta Amarilla para {{ getPlayerName(getTeamById(e.teamId), e.playerId) }} ({{ getTeamById(e.teamId)?.shortName }})
           }
           @else if (e.type === 'red') {
-            <strong>¡EXPULSADO!</strong> {{ getPlayerName(getTeamById(e.teamId), e.playerId) }} deja la cancha.
+            <strong>¡EXPULSADO!</strong> {{ getPlayerName(getTeamById(e.teamId), e.playerId) }} ({{ getTeamById(e.teamId)?.shortName }}) deja la cancha.
           }
           @else {
-            {{ e.type }} - {{ getPlayerName(getTeamById(e.teamId), e.playerId) }}
+            {{ e.type }} - {{ getPlayerName(getTeamById(e.teamId), e.playerId) }} ({{ getTeamById(e.teamId)?.shortName }})
           }
         </div>
 

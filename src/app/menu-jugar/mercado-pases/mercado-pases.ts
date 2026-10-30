@@ -24,11 +24,19 @@ export class MercadoPases {
   private readonly router = inject(Router);
   private readonly gameState = inject(GameStateService);
 
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
+
+  // Siempre priorizamos el equipo real de la partida activa para impedir manipulación por URL
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
 
   // Equipos y equipo del usuario
   protected readonly teams = computed(() => this.gameState.teams());
-  protected readonly myTeam = computed(() => this.gameState.getTeamById(this.teamId));
+  protected readonly myTeam = computed(() => {
+    const id = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+    return this.gameState.getTeamById(id);
+  });
 
   // Contador reactivo de intentos restantes (máximo 10 por partida)
   protected readonly attemptsLeft = computed(() => this.gameState.transferAttemptsLeft());
@@ -36,11 +44,12 @@ export class MercadoPases {
   protected readonly transferHistory = computed(() => this.gameState.transferHistory());
 
   // Equipos rivales disponibles para negociar
-  protected readonly rivalTeams = computed(() =>
-    this.teams().filter(t => Number(t.id) !== Number(this.teamId))
-  );
+  protected readonly rivalTeams = computed(() => {
+    const myId = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+    return this.teams().filter(t => Number(t.id) !== myId);
+  });
 
-  // Estado UI de selección
+  // Estado UI de selección (siempre normalizado a number)
   protected readonly selectedRivalTeamId = signal<number | null>(null);
   protected readonly selectedMyPlayerId = signal<number | null>(null);
   protected readonly selectedTargetPlayerId = signal<number | null>(null);
@@ -59,18 +68,27 @@ export class MercadoPases {
   private initializedRival = false;
 
   constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     effect(() => {
       const rivals = this.rivalTeams();
       if (rivals.length > 0 && !this.initializedRival) {
-        this.selectedRivalTeamId.set(rivals[0].id);
+        this.selectedRivalTeamId.set(Number(rivals[0].id));
         this.initializedRival = true;
       }
     });
   }
 
+  toNum(value: number | string): number {
+    return Number(value);
+  }
+
   protected readonly selectedRivalTeam = computed(() => {
     const id = this.selectedRivalTeamId();
-    if (!id) return null;
+    if (id === null) return null;
     return this.rivalTeams().find(t => Number(t.id) === Number(id)) ?? null;
   });
 
@@ -111,7 +129,7 @@ export class MercadoPases {
     return (this.selectedRivalTeam()?.squad ?? []).find(p => Number(p.id) === Number(id)) ?? null;
   });
 
-  // Validación táctica (para no dejar un equipo sin arquero o con formación inválida si ambos son titulares)
+  // Validación táctica (para no dejar un equipo sin arquero o con formación inválida si son titulares)
   protected readonly tacticalValidation = computed(() => {
     const myP = this.selectedMyPlayer();
     const targetP = this.selectedTargetPlayer();
@@ -135,7 +153,7 @@ export class MercadoPases {
       if (myP.isStarter && !this.wouldFormationRemainValid(myTeam, myP, targetP)) {
         return {
           valid: false,
-          reason: `Este cambio dejaría a tu equipo con una formación titular inválida. Elegí un jugador de la misma posición (${myP.position}) o pasalo al banquillo primero.`
+          reason: `Este cambio dejaría a tu equipo con una formación titular inválida. Elegí un jugador de la misma posición (${myP.position}) o pasalo al banquillo en Plantilla primero.`
         };
       }
       if (targetP.isStarter && !this.wouldFormationRemainValid(rivalTeam, targetP, myP)) {
@@ -156,27 +174,23 @@ export class MercadoPases {
 
     if (!myP || !targetP) return null;
 
-    const diff = myP.rating - targetP.rating; // positivo si ofrezco mejor media, negativo si pido mejor media
+    const diff = myP.rating - targetP.rating;
     let prob = 65; // Probabilidad base a igualdad de media (ej. 80 por 80 = 65%)
 
     if (diff > 0) {
-      // Ofrezco un jugador con mayor media que el que pido
       prob += diff * 8;
     } else if (diff < 0) {
       const gap = Math.abs(diff);
       if (gap <= 3) {
-        // Diferencia corta (1 a 3 puntos): baja 11% por punto
         prob -= gap * 11;
       } else if (gap <= 7) {
-        // Diferencia media (4 a 7 puntos): ej. 78 por 84 (-6) -> ~12%
         prob = 32 - (gap - 3) * 5.5;
       } else {
-        // Diferencia grande (8+ puntos, ej. 75 por 88 = -13): casi imposible (2% a 6%)
         prob = Math.max(2, 10 - (gap - 7) * 1.5);
       }
     }
 
-    // Modificador por coincidencia de posición (misma línea táctica facilita el trueque)
+    // Modificador por coincidencia de posición
     const samePos = myP.position === targetP.position;
     if (samePos) {
       prob += 8;
@@ -191,7 +205,6 @@ export class MercadoPases {
       prob += 4;
     }
 
-    // Limitar entre 2% y 95%
     const finalProb = Math.round(Math.max(2, Math.min(95, prob)));
 
     let difficultyLabel = 'Negociación Pareja';
@@ -236,19 +249,40 @@ export class MercadoPases {
     return VALID_FORMATIONS.includes(code);
   }
 
-  selectRivalTeam(teamId: number) {
+  selectRivalTeam(teamId: number | string) {
     this.selectedRivalTeamId.set(Number(teamId));
     this.selectedTargetPlayerId.set(null);
+    this.searchQuery.set('');
     this.negotiationFeedback.set(null);
   }
 
   selectMyPlayer(player: Player) {
-    this.selectedMyPlayerId.set(Number(player.id));
+    const nextId = Number(player.id);
+    if (this.selectedMyPlayerId() === nextId) {
+      this.selectedMyPlayerId.set(null);
+    } else {
+      this.selectedMyPlayerId.set(nextId);
+    }
     this.negotiationFeedback.set(null);
   }
 
   selectTargetPlayer(player: Player) {
-    this.selectedTargetPlayerId.set(Number(player.id));
+    const nextId = Number(player.id);
+    if (this.selectedTargetPlayerId() === nextId) {
+      this.selectedTargetPlayerId.set(null);
+    } else {
+      this.selectedTargetPlayerId.set(nextId);
+    }
+    this.negotiationFeedback.set(null);
+  }
+
+  clearMyPlayer() {
+    this.selectedMyPlayerId.set(null);
+    this.negotiationFeedback.set(null);
+  }
+
+  clearTargetPlayer() {
+    this.selectedTargetPlayerId.set(null);
     this.negotiationFeedback.set(null);
   }
 
@@ -274,7 +308,7 @@ export class MercadoPases {
     this.gameState.executeTransferAttempt({
       myTeamId: this.teamId,
       myPlayerId: Number(myP.id),
-      targetTeamId: rivalTeam.id,
+      targetTeamId: Number(rivalTeam.id),
       targetPlayerId: Number(targetP.id),
       probability: evalData.probability,
       accepted,
@@ -315,12 +349,13 @@ export class MercadoPases {
     });
   }
 
-  getTeamLogo(id: number): string {
+  getTeamLogo(id: number | string): string {
     return `/logos/${id}.png`;
   }
 
   handleMissingImage(event: Event) {
     const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
     imgElement.src = '/logos/default.png';
   }
 

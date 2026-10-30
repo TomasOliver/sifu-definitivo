@@ -74,8 +74,8 @@
   </div>
 
   <div class="button-group">
-    <button type="submit" [disabled]="form.invalid || form.pending" class="btn-primary">
-      <span>Crear cuenta</span>
+    <button type="submit" [disabled]="form.invalid || form.pending || isSubmitting()" class="btn-primary">
+      <span>{{ isSubmitting() ? 'Creando cuenta...' : 'Crear cuenta' }}</span>
       <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="5" y1="12" x2="19" y2="12"/>
         <polyline points="13 6 19 12 13 18"/>
@@ -91,8 +91,8 @@
     </div>
   </div>
 
-  @if (msg) {
-    <p class="form-message">{{ msg }}</p>
+  @if (msg()) {
+    <p class="form-message">{{ msg() }}</p>
   }
 
 </form>

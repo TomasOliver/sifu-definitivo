@@ -19,15 +19,22 @@ export class MenuSimulacion {
   private readonly route = inject(ActivatedRoute);
   private gameState = inject(GameStateService);
 
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id') ?? 0);
-  private readonly location = inject(Location);
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id') ?? 0);
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
 
   // obtenemos el equipo seleccionado del estado del juego
   protected team = computed<Teams | undefined>(() => {
-    const id = this.gameState.selectedTeamId() ?? this.teamId;
+    const id = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
     if (!id) return undefined;
     return this.gameState.getTeamById(id);
   });
+
+  protected readonly hasPendingMatches = computed(() =>
+    this.gameState.fixture().some(m => !m.played)
+  );
 
   // Computeds para separar jugadores por línea 
   viewGK = computed(() => this.team()?.squad.filter(p => p.isStarter && p.position === 'GK') ?? []);
@@ -45,17 +52,29 @@ export class MenuSimulacion {
   });
 
   constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
   }
 
   goBack() {
     this.router.navigate(['/inicio', this.teamId]);
   }
-  navigateToSimulacionPartido(id: number) {
+  navigateToSimulacionPartido(_id?: number) {
+    if (!this.hasPendingMatches()) {
+      this.router.navigate(['/inicio', this.teamId]);
+      return;
+    }
     this.gameState.authorizeNextMatchSimulation();
-    this.router.navigateByUrl(`/simulacionPartido/${id}`);
+    this.router.navigateByUrl(`/simulacionPartido/${this.teamId}`);
   }
-  navigateToSimulacionPartidoRapido(id: number) {
+  navigateToSimulacionPartidoRapido(_id?: number) {
+    if (!this.hasPendingMatches()) {
+      this.router.navigate(['/inicio', this.teamId]);
+      return;
+    }
     this.gameState.authorizeNextMatchSimulation();
-    this.router.navigateByUrl(`/simulacionPartidoRapido/${id}`);
+    this.router.navigateByUrl(`/simulacionPartidoRapido/${this.teamId}`);
   }
 }

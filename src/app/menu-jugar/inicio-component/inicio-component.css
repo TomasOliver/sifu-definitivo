@@ -237,7 +237,7 @@
 }
 
 .stand-box h3 {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 0.85rem;
   font-weight: 800;
   color: #b4e629;
@@ -245,8 +245,22 @@
   letter-spacing: 0.12em;
 }
 
+.stand-team-crest {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 10px auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.48));
+  transition: transform 0.25s ease;
+}
+
+.stand-box:hover .stand-team-crest {
+  transform: scale(1.07);
+}
+
 .stand-box .team-name {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 12px 0;

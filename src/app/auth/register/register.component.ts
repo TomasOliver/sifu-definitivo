@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth-service';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -17,7 +17,8 @@ export class RegisterComponent {
   private router = inject(Router);
 
   form: FormGroup;
-  msg = '';
+  msg = signal<string>('');
+  isSubmitting = signal<boolean>(false);
 
   constructor() {
     this.form = this.fb.group({
@@ -42,7 +43,9 @@ export class RegisterComponent {
   }
 
   usernameExisteValidator(control: any) { //VALIDACION CREADA POR NOSOTROS PARA NO REPETIR USUARIOS
-    return this.auth.checkUserExists(control.value).pipe(
+    const value = (control.value ?? '').trim();
+    if (!value) return of(null);
+    return this.auth.checkUserExists(value).pipe(
       map(users => {
         return users.length > 0 ? { usuarioExistente: true } : null;
       })
@@ -50,15 +53,21 @@ export class RegisterComponent {
   }
 
   register() { //"SUBMIT"
-    const { username, password } = this.form.value; 
+    if (this.form.invalid || this.form.pending || this.isSubmitting()) return;
+    const rawUsername = (this.form.value.username ?? '').trim();
+    const password = this.form.value.password ?? '';
 
-    this.auth.register(username, password).subscribe({
+    this.isSubmitting.set(true);
+    this.msg.set('');
+
+    this.auth.register(rawUsername, password).subscribe({
       next: () => {
-        this.msg = 'Usuario creado con éxito';
+        this.msg.set('Usuario creado con éxito');
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
-        this.msg = err;
+        this.isSubmitting.set(false);
+        this.msg.set(typeof err === 'string' ? err : 'Error al registrar usuario');
       }
     });
   }

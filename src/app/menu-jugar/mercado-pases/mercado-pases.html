@@ -120,7 +120,12 @@
         <div class="trade-slots">
           <!-- Slot Jugador Ofrecido -->
           <div class="trade-slot" [class.filled]="selectedMyPlayer()">
-            <span class="slot-label">ENTREGÁS A</span>
+            <div class="slot-header-row">
+              <span class="slot-label">ENTREGÁS A</span>
+              @if (selectedMyPlayer()) {
+                <button type="button" class="slot-clear-btn" (click)="clearMyPlayer()" title="Quitar selección">&times;</button>
+              }
+            </div>
             @if (selectedMyPlayer(); as myP) {
               <div class="slot-player-info">
                 <div class="slot-ovr">{{ myP.rating }}</div>
@@ -138,7 +143,12 @@
 
           <!-- Slot Jugador Solicitado -->
           <div class="trade-slot" [class.filled]="selectedTargetPlayer()">
-            <span class="slot-label">RECIBÍS A</span>
+            <div class="slot-header-row">
+              <span class="slot-label">RECIBÍS A</span>
+              @if (selectedTargetPlayer()) {
+                <button type="button" class="slot-clear-btn" (click)="clearTargetPlayer()" title="Quitar selección">&times;</button>
+              }
+            </div>
             @if (selectedTargetPlayer(); as targetP) {
               <div class="slot-player-info">
                 <div class="slot-ovr target">{{ targetP.rating }}</div>
@@ -265,7 +275,7 @@
             [ngModel]="selectedRivalTeamId()"
             (ngModelChange)="selectRivalTeam($event)">
             @for (t of rivalTeams(); track t.id) {
-              <option [ngValue]="t.id">{{ t.name }} ({{ t.shortName }})</option>
+              <option [ngValue]="toNum(t.id)">{{ t.name }} ({{ t.shortName }})</option>
             }
           </select>
         </div>

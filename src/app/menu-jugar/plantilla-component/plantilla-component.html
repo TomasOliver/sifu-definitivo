@@ -83,7 +83,7 @@
           @for (p of viewFW(); track p.id) {
           <div class="player-token" title="{{p.name}}">
             <div class="jersey-icon"></div>
-            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+            <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
           </div>
           }
         </div>
@@ -92,7 +92,7 @@
           @for (p of viewMF(); track p.id) {
           <div class="player-token" title="{{p.name}}">
             <div class="jersey-icon"></div>
-            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+            <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
           </div>
           }
         </div>
@@ -101,7 +101,7 @@
           @for (p of viewDF(); track p.id) {
           <div class="player-token" title="{{p.name}}">
             <div class="jersey-icon"></div>
-            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+            <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
           </div>
           }
         </div>
@@ -110,7 +110,7 @@
           @for (p of viewGK(); track p.id) {
           <div class="player-token gk" title="{{p.name}}">
             <div class="jersey-icon"></div>
-            <span class="player-name">{{ p.name.split(' ').pop() }}</span>
+            <span class="player-name">{{ getShortPlayerName(p.name) }}</span>
           </div>
           }
         </div>

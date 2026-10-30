@@ -1,0 +1,53 @@
+<svg viewBox="10 4 160 196" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldLime" x1="0" y1="0" x2="180" y2="205" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4f338"/>
+      <stop offset="50%" stop-color="#b4e329"/>
+      <stop offset="100%" stop-color="#76b82a"/>
+    </linearGradient>
+    <linearGradient id="shieldDark" x1="90" y1="36" x2="90" y2="195" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0b2417"/>
+      <stop offset="100%" stop-color="#04110a"/>
+    </linearGradient>
+    <linearGradient id="stripeGreen" x1="90" y1="45" x2="90" y2="185" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#b8eb2c"/>
+      <stop offset="100%" stop-color="#3c8d2f"/>
+    </linearGradient>
+    <clipPath id="innerShieldClip">
+      <path d="M90 44 L152 64 C152 124 134 162 90 185 C46 162 28 124 28 64 Z"/>
+    </clipPath>
+  </defs>
+
+  <path d="M68 28 L63 13 L79 20 L90 7 L101 20 L117 13 L112 28 Z" fill="url(#goldLime)"/>
+  <path d="M69 31 H111 C112.5 31 113.5 32 113.5 33.5 C113.5 35 112.5 36 111 36 H69 C67.5 36 66.5 35 66.5 33.5 C66.5 32 67.5 31 69 31 Z" fill="#9bd326"/>
+
+  <path d="M90 36 L160 59 C160 126 140 169 90 195 C40 169 20 126 20 59 Z" fill="url(#goldLime)"/>
+  <path d="M90 41 L155 62 C155 125 136 164 90 189 C44 164 25 125 25 62 Z" fill="url(#shieldDark)"/>
+
+  <g clip-path="url(#innerShieldClip)">
+    <rect x="25" y="40" width="130" height="150" fill="#071910"/>
+    <rect x="42" y="40" width="18" height="150" fill="url(#stripeGreen)"/>
+    <rect x="81" y="40" width="18" height="150" fill="url(#stripeGreen)" opacity="0.85"/>
+    <rect x="120" y="40" width="18" height="150" fill="url(#stripeGreen)"/>
+    <polygon points="25,40 155,40 60,190 25,190" fill="#ffffff" fill-opacity="0.04"/>
+  </g>
+
+  <path d="M90 45 L151 64.5 C151 123 133 160.5 90 184 C47 160.5 29 123 29 64.5 Z" stroke="#8ad128" stroke-width="2" stroke-opacity="0.6" fill="none"/>
+  <circle cx="90" cy="96" r="39" fill="#04100a" fill-opacity="0.75"/>
+
+  <g transform="translate(90, 93)">
+    <circle cx="0" cy="0" r="35" fill="#f4f7f5" stroke="#081c11" stroke-width="3"/>
+    <path d="M 22 -27 A 35 35 0 0 1 -20 28 A 33 35 0 0 0 22 -27 Z" fill="#cfd8d3" opacity="0.5"/>
+    <polygon points="0,-13 12,-4 8,10 -8,10 -12,-4" fill="#0c2015"/>
+    <line x1="0" y1="-13" x2="0" y2="-27" stroke="#0c2015" stroke-width="2.5"/>
+    <line x1="12" y1="-4" x2="26" y2="-9" stroke="#0c2015" stroke-width="2.5"/>
+    <line x1="8" y1="10" x2="18" y2="23" stroke="#0c2015" stroke-width="2.5"/>
+    <line x1="-8" y1="10" x2="-18" y2="23" stroke="#0c2015" stroke-width="2.5"/>
+    <line x1="-12" y1="-4" x2="-26" y2="-9" stroke="#0c2015" stroke-width="2.5"/>
+    <polygon points="-9,-33 0,-26 9,-33 5,-35 -5,-35" fill="#0c2015"/>
+    <polygon points="25,-9 32,-19 35,-6 31,4" fill="#0c2015"/>
+    <polygon points="17,22 29,20 23,30 10,32" fill="#0c2015"/>
+    <polygon points="-17,22 -10,32 -23,30 -29,20" fill="#0c2015"/>
+    <polygon points="-25,-9 -31,4 -35,-6 -32,-19" fill="#0c2015"/>
+  </g>
+</svg>

@@ -75,6 +75,12 @@ export class ListaPartidasGuardadas {
     return `/logos/${teamId}.png`; 
   }
 
+  handleMissingImage(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
+    imgElement.src = '/logos/default.png';
+  }
+
   continuarPartida(save: Saves) {
     this.gameState.loadSave(save);
     this.router.navigate(['/inicio', save.teamId]);
@@ -88,9 +94,9 @@ export class ListaPartidasGuardadas {
     this.savesService.deleteSave(save.id).subscribe({
       next: () => {
         // quitar la partida eliminada del signal
-        this.saves.update(lista => lista.filter(s => s.id !== save.id));
-        if (this.gameState.currentSave()?.id === save.id) {
-          localStorage.removeItem('activeSaveId');
+        this.saves.update(lista => lista.filter(s => String(s.id) !== String(save.id)));
+        if (String(this.gameState.currentSave()?.id) === String(save.id)) {
+          this.gameState.clearActiveGame();
         }
         console.log("Partida eliminada correctamente:", save.id);
       },

@@ -1,8 +1,7 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { GameStateService } from '../../menu-jugar/game-state-service';
 import { Match } from '../../models/match';
-import { MatchEvent } from '../../models/match-event';
 import { Teams } from '../../models/teams';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -16,23 +15,31 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 export class FixtureComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  // sacamos el ID del equipo de la url
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
-  private readonly location = inject(Location);
   private readonly gameState = inject(GameStateService);
+
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
 
   // Estado UI del selector de jornadas (estilo OneFootball)
   protected readonly selectedMatchday = signal<number>(1);
   protected readonly isSelectorOpen = signal<boolean>(false);
   protected readonly viewAllMatchdays = signal<boolean>(false);
 
-  // Estado UI del detalle del partido seleccionado (comentarios y resumen)
-  protected readonly selectedMatch = signal<Match | null>(null);
+  // Estado UI del detalle del partido seleccionado (por ID para mantenerse reactivo al fixture)
+  protected readonly selectedMatchId = signal<number | null>(null);
   protected readonly activeDetailTab = signal<'resumen' | 'comentarios'>('resumen');
 
   private initializedMatchday = false;
 
   constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     // Posicionamos automáticamente en la jornada en curso al cargar el fixture
     effect(() => {
       const matchdays = this.fixtureByMatchday();
@@ -47,15 +54,22 @@ export class FixtureComponent {
     });
   }
 
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    if (this.selectedMatchId() !== null) {
+      this.closeMatchDetail();
+    } else if (this.isSelectorOpen()) {
+      this.closeSelector();
+    }
+  }
+
   goBack() {
     this.router.navigate(['/inicio', this.teamId]);
   }
 
-  // acceso directo al fixture
-  protected readonly fixture = computed(() => this.gameState.getState()?.fixture ?? []);
-
-  // equipos (para mostrar nombres y escudos)
-  protected readonly teams = computed(() => this.gameState.getState()?.teams ?? []);
+  // acceso directo al fixture y equipos desde los signals del estado global
+  protected readonly fixture = computed(() => this.gameState.fixture());
+  protected readonly teams = computed(() => this.gameState.teams());
 
   // agrupamos partidos por fecha (matchday)
   protected readonly fixtureByMatchday = computed(() => {
@@ -84,7 +98,13 @@ export class FixtureComponent {
       });
   });
 
-  // Jornada actual de la temporada (primera con partidos pendientes)
+  // Indica si ya se completaron todas las jornadas del torneo
+  protected readonly isSeasonFinished = computed(() => {
+    const matchdays = this.fixtureByMatchday();
+    return matchdays.length > 0 && matchdays.every(md => md.allPlayed);
+  });
+
+  // Jornada actual de la temporada (primera con partidos pendientes, o la última si finalizó)
   protected readonly activeSeasonMatchday = computed(() => {
     const matchdays = this.fixtureByMatchday();
     if (matchdays.length === 0) return 1;
@@ -115,6 +135,12 @@ export class FixtureComponent {
   protected readonly maxMatchday = computed(() => {
     const matchdays = this.fixtureByMatchday();
     return matchdays.length > 0 ? matchdays[matchdays.length - 1].matchday : 1;
+  });
+
+  protected readonly selectedMatch = computed(() => {
+    const id = this.selectedMatchId();
+    if (id === null) return null;
+    return this.fixture().find(m => m.id === id) ?? null;
   });
 
   // Estadísticas y eventos del partido seleccionado para el modal de Detalle
@@ -160,7 +186,16 @@ export class FixtureComponent {
   });
 
   toggleSelector() {
-    this.isSelectorOpen.update(v => !v);
+    const nextState = !this.isSelectorOpen();
+    this.isSelectorOpen.set(nextState);
+    if (nextState) {
+      setTimeout(() => {
+        document.querySelector('.matchday-dropdown-item.selected')?.scrollIntoView({
+          block: 'center',
+          behavior: 'instant' as ScrollBehavior
+        });
+      }, 0);
+    }
   }
 
   closeSelector() {
@@ -174,18 +209,24 @@ export class FixtureComponent {
   }
 
   prevMatchday() {
+    if (this.viewAllMatchdays()) {
+      this.viewAllMatchdays.set(false);
+      return;
+    }
     const current = this.selectedMatchday();
     if (current > this.minMatchday()) {
       this.selectedMatchday.set(current - 1);
-      this.viewAllMatchdays.set(false);
     }
   }
 
   nextMatchday() {
+    if (this.viewAllMatchdays()) {
+      this.viewAllMatchdays.set(false);
+      return;
+    }
     const current = this.selectedMatchday();
     if (current < this.maxMatchday()) {
       this.selectedMatchday.set(current + 1);
-      this.viewAllMatchdays.set(false);
     }
   }
 
@@ -201,38 +242,53 @@ export class FixtureComponent {
   }
 
   openMatchDetail(match: Match) {
-    this.selectedMatch.set(match);
+    this.selectedMatchId.set(match.id);
     this.activeDetailTab.set('resumen');
   }
 
   closeMatchDetail() {
-    this.selectedMatch.set(null);
+    this.selectedMatchId.set(null);
   }
 
   setDetailTab(tab: 'resumen' | 'comentarios') {
     this.activeDetailTab.set(tab);
   }
 
-  getTeamById(id: number): Teams | undefined {
+  getTeamById(id: number | string): Teams | undefined {
     return this.teams().find(t => Number(t.id) === Number(id));
   }
 
-  getTeamName(id: number): string {
+  getTeamName(id: number | string): string {
     return this.getTeamById(id)?.name ?? '???';
   }
 
-  getTeamShortName(id: number): string {
+  getTeamShortName(id: number | string): string {
     return this.getTeamById(id)?.shortName ?? 'EQP';
   }
 
-  getTeamLogo(id: number): string {
+  getTeamLogo(id: number | string): string {
     return `/logos/${id}.png`;
   }
 
-  getPlayerName(teamId: number, playerId: number | undefined): string {
+  handleMissingImage(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
+    imgElement.src = '/logos/default.png';
+  }
+
+  // Busca el nombre del jugador en el equipo del evento, y si fue traspasado luego, lo busca en el resto de clubes
+  getPlayerName(teamId: number | string, playerId: number | undefined): string {
     if (playerId === undefined || playerId === null) return 'Desconocido';
+    const targetId = Number(playerId);
     const team = this.getTeamById(teamId);
-    return team?.squad.find(p => Number(p.id) === Number(playerId))?.name ?? 'Desconocido';
+    const inOriginalTeam = team?.squad.find(p => Number(p.id) === targetId);
+    if (inOriginalTeam) return inOriginalTeam.name;
+
+    for (const club of this.teams()) {
+      const found = club.squad.find(p => Number(p.id) === targetId);
+      if (found) return found.name;
+    }
+    return 'Desconocido';
   }
 
   getTeamStarterAverage(team: Teams | undefined): number {
@@ -243,7 +299,8 @@ export class FixtureComponent {
     return Math.round(avg);
   }
 
-  isUserTeam(id: number): boolean {
-    return Number(id) === Number(this.teamId);
+  isUserTeam(id: number | string): boolean {
+    const myId = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+    return Number(id) === myId;
   }
 }

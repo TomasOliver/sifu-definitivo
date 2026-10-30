@@ -1,8 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { GameStateService } from '../../menu-jugar/game-state-service';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Teams } from '../../models/teams';
 import { Player } from '../../models/player';
 import { LeagueStanding } from '../../models/league-standing';
 
@@ -16,14 +15,30 @@ import { LeagueStanding } from '../../models/league-standing';
 export class TablaComponent {
 
   private readonly gameState = inject(GameStateService);
-  private readonly location = inject(Location);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
 
   // Estado UI del detalle del equipo seleccionado en la tabla
   protected readonly selectedDetailTeamId = signal<number | null>(null);
-  protected readonly selectedStandingPosition = signal<number>(1);
+
+  constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    if (this.selectedDetailTeamId() !== null) {
+      this.closeTeamDetail();
+    }
+  }
 
   // Acceso a la tabla desde el estado global
   readonly standings = computed(() => this.gameState.standings());
@@ -61,8 +76,10 @@ export class TablaComponent {
     const team = this.teams().find(t => Number(t.id) === Number(targetId));
     if (!team) return null;
 
-    const standing = this.sortedStandings().find(s => Number(s.teamId) === Number(targetId)) ?? null;
-    const position = this.selectedStandingPosition();
+    const sorted = this.sortedStandings();
+    const standingIndex = sorted.findIndex(s => Number(s.teamId) === Number(targetId));
+    const standing = standingIndex >= 0 ? sorted[standingIndex] : null;
+    const position = standingIndex >= 0 ? standingIndex + 1 : 1;
 
     const squad = team.squad ?? [];
     const starters = this.sortByPosition(squad.filter(p => p.isStarter));
@@ -107,13 +124,18 @@ export class TablaComponent {
     };
   });
 
-  openTeamDetail(row: LeagueStanding, index: number) {
-    this.selectedStandingPosition.set(index + 1);
+  openTeamDetail(row: LeagueStanding, _index?: number) {
     this.selectedDetailTeamId.set(Number(row.teamId));
   }
 
   closeTeamDetail() {
     this.selectedDetailTeamId.set(null);
+  }
+
+  getShortPlayerName(name: string): string {
+    const trimmed = (name ?? '').trim();
+    if (!trimmed) return 'Jugador';
+    return trimmed.split(/\s+/).pop() || trimmed;
   }
 
   private sortByPosition(players: Player[]): Player[] {
@@ -141,6 +163,7 @@ export class TablaComponent {
 
   handleMissingImage(event: Event) {
     const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
     // Si falla pone el escudo por defecto
     imgElement.src = '/logos/default.png';
   }

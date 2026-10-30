@@ -20,16 +20,22 @@ const VALID_FORMATIONS = [
 })
 export class PlantillaComponent {
   //servicios y rutas
-  private readonly service = inject(TeamsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly gameState = inject(GameStateService);
 
-  //id del equipo seleccionado
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
+
+  // Siempre usamos el equipo de la partida activa para impedir editar planteles rivales por URL
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
 
   //signal del equipo y isLoading (leído del estado de la partida actual)
-  public readonly team = computed(() => this.gameState.getTeamById(this.teamId));
+  public readonly team = computed(() => {
+    const id = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+    return this.gameState.getTeamById(id);
+  });
   public readonly squad = computed(() => this.team()?.squad ?? []);
   public readonly isLoading = computed(() => this.team() === undefined);
 
@@ -57,6 +63,10 @@ export class PlantillaComponent {
   viewFW = computed(() => this.titulares().filter(p => p.position === 'FW'));
 
   constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
   }
 
   titulares = computed(() =>
@@ -97,7 +107,7 @@ export class PlantillaComponent {
   private esFormacionValida(titularSaliente: Player, suplenteEntrante: Player): boolean {
     // Creamos una lista hipotetica de como quedarian los titulares
     const nuevosTitulares: Player[] = this.titulares()
-      .filter((p: Player) => p.id !== titularSaliente.id) // Sacamos al titular
+      .filter((p: Player) => Number(p.id) !== Number(titularSaliente.id)) // Sacamos al titular
       .concat(suplenteEntrante);                // Agregamos al suplente
 
     // Contamos cuantos hay de cada posición en esa nueva lista
@@ -147,11 +157,19 @@ export class PlantillaComponent {
       (a, b) => orden.indexOf(a.position!) - orden.indexOf(b.position!)
     );
   }
+  getShortPlayerName(name: string): string {
+    const trimmed = (name ?? '').trim();
+    if (!trimmed) return 'Jugador';
+    return trimmed.split(/\s+/).pop() || trimmed;
+  }
+
   getTeamLogo(teamId: number): string {
     return `/logos/${teamId}.png`;
   }
+
   handleMissingImage(event: Event) {
     const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
     imgElement.src = '/logos/default.png'; 
   }
 

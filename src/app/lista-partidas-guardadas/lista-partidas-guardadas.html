@@ -16,7 +16,7 @@
     <div class="save-card">
 
       <div class="card-header">
-        <img [src]="getTeamLogo(save.teamId)" alt="Logo" class="mini-logo">
+        <img [src]="getTeamLogo(save.teamId)" (error)="handleMissingImage($event)" alt="Logo" class="mini-logo">
         <div class="save-info">
           <h2>{{ save.nameSave }}</h2>
           <p class="team-name">DT de: <strong>{{ getTeamName(save.teamId) }}</strong></p>

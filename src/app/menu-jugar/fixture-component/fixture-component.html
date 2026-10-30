@@ -24,7 +24,11 @@
   <div class="toolbar-actions">
     @if (selectedMatchday() !== activeSeasonMatchday() || viewAllMatchdays()) {
       <button class="btn-quick-action" (click)="goToActiveMatchday()">
-        Ir a Jornada en curso (J{{ activeSeasonMatchday() }})
+        @if (isSeasonFinished()) {
+          Ir a Última Jornada (J{{ activeSeasonMatchday() }})
+        } @else {
+          Ir a Jornada en curso (J{{ activeSeasonMatchday() }})
+        }
       </button>
     }
     <button class="btn-quick-action secondary" (click)="toggleViewAll()">
@@ -47,7 +51,7 @@
         type="button"
         class="nav-step-btn"
         (click)="prevMatchday()"
-        [disabled]="selectedMatchday() <= minMatchday() && !viewAllMatchdays()"
+        [disabled]="!viewAllMatchdays() && selectedMatchday() <= minMatchday()"
         title="Jornada anterior">
         &#8249;
       </button>
@@ -85,7 +89,7 @@
         type="button"
         class="nav-step-btn"
         (click)="nextMatchday()"
-        [disabled]="selectedMatchday() >= maxMatchday() && !viewAllMatchdays()"
+        [disabled]="!viewAllMatchdays() && selectedMatchday() >= maxMatchday()"
         title="Jornada siguiente">
         &#8250;
       </button>
@@ -106,7 +110,7 @@
               type="button"
               class="matchday-dropdown-item"
               [class.selected]="!viewAllMatchdays() && md.matchday === selectedMatchday()"
-              [class.is-current]="md.matchday === activeSeasonMatchday()"
+              [class.is-current]="!md.allPlayed && md.matchday === activeSeasonMatchday()"
               (click)="selectMatchday(md.matchday)">
               <div class="dropdown-item-left">
                 <span class="dropdown-item-title">Jornada {{ md.matchday }}</span>
@@ -122,10 +126,10 @@
               </div>
 
               <div class="dropdown-item-right">
-                @if (md.matchday === activeSeasonMatchday()) {
-                  <span class="status-pill current">En curso</span>
-                } @else if (md.allPlayed) {
+                @if (md.allPlayed) {
                   <span class="status-pill finished">Finalizada</span>
+                } @else if (md.matchday === activeSeasonMatchday()) {
+                  <span class="status-pill current">En curso</span>
                 } @else {
                   <span class="status-pill upcoming">Próxima</span>
                 }
@@ -183,7 +187,7 @@
                     class="team-crest"
                     [src]="getTeamLogo(match.homeTeamId)"
                     [alt]="getTeamName(match.homeTeamId)"
-                    onerror="this.src='/logos/default.png'" />
+                    (error)="handleMissingImage($event)" />
                   <span class="team-name">{{ getTeamName(match.homeTeamId) }}</span>
                   @if (isUserTeam(match.homeTeamId)) {
                     <span class="my-team-tag">TU EQUIPO</span>
@@ -198,7 +202,7 @@
                     class="team-crest"
                     [src]="getTeamLogo(match.awayTeamId)"
                     [alt]="getTeamName(match.awayTeamId)"
-                    onerror="this.src='/logos/default.png'" />
+                    (error)="handleMissingImage($event)" />
                   <span class="team-name">{{ getTeamName(match.awayTeamId) }}</span>
                   @if (isUserTeam(match.awayTeamId)) {
                     <span class="my-team-tag">TU EQUIPO</span>
@@ -270,7 +274,7 @@
             class="modal-team-crest"
             [src]="getTeamLogo(detail.match.homeTeamId)"
             [alt]="getTeamName(detail.match.homeTeamId)"
-            onerror="this.src='/logos/default.png'" />
+            (error)="handleMissingImage($event)" />
           <span class="modal-team-name">{{ getTeamName(detail.match.homeTeamId) }}</span>
           <span class="modal-team-ovr">Media: {{ detail.homeStats.ratingAvg }}</span>
         </div>
@@ -294,7 +298,7 @@
             class="modal-team-crest"
             [src]="getTeamLogo(detail.match.awayTeamId)"
             [alt]="getTeamName(detail.match.awayTeamId)"
-            onerror="this.src='/logos/default.png'" />
+            (error)="handleMissingImage($event)" />
           <span class="modal-team-name">{{ getTeamName(detail.match.awayTeamId) }}</span>
           <span class="modal-team-ovr">Media: {{ detail.awayStats.ratingAvg }}</span>
         </div>
@@ -378,7 +382,7 @@
                 </div>
               </div>
 
-              <!-- Columnas de incidencias por equipo (mismo formato que SimularPartidoRapido) -->
+              <!-- Columnas de incidencias por equipo -->
               <h4 class="section-mini-title">Incidencias por Equipo</h4>
 
               @if (detail.events.length === 0) {
@@ -390,7 +394,7 @@
                   <!-- Columna Local -->
                   <div class="summary-col">
                     <div class="summary-col-header">
-                      <img [src]="getTeamLogo(detail.match.homeTeamId)" alt="" onerror="this.src='/logos/default.png'" />
+                      <img [src]="getTeamLogo(detail.match.homeTeamId)" alt="" (error)="handleMissingImage($event)" />
                       <span>{{ getTeamName(detail.match.homeTeamId) }}</span>
                     </div>
 
@@ -412,9 +416,11 @@
                         </span>
                         <div class="ev-info">
                           @if (e.type === 'goal') {
-                            <strong>¡GOL!</strong> {{ getPlayerName(detail.match.homeTeamId, e.playerId) }}
+                            <span><strong>¡GOL!</strong> {{ getPlayerName(detail.match.homeTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.homeTeamId) }})</span>
+                          } @else if (e.type === 'red') {
+                            <span><strong>¡EXPULSADO!</strong> {{ getPlayerName(detail.match.homeTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.homeTeamId) }})</span>
                           } @else {
-                            {{ getPlayerName(detail.match.homeTeamId, e.playerId) }}
+                            <span>{{ getPlayerName(detail.match.homeTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.homeTeamId) }})</span>
                           }
                           @if (e.assistId) {
                             <span class="ev-assist">(Asist: {{ getPlayerName(detail.match.homeTeamId, e.assistId) }})</span>
@@ -429,7 +435,7 @@
                   <!-- Columna Visitante -->
                   <div class="summary-col">
                     <div class="summary-col-header">
-                      <img [src]="getTeamLogo(detail.match.awayTeamId)" alt="" onerror="this.src='/logos/default.png'" />
+                      <img [src]="getTeamLogo(detail.match.awayTeamId)" alt="" (error)="handleMissingImage($event)" />
                       <span>{{ getTeamName(detail.match.awayTeamId) }}</span>
                     </div>
 
@@ -451,9 +457,11 @@
                         </span>
                         <div class="ev-info">
                           @if (e.type === 'goal') {
-                            <strong>¡GOL!</strong> {{ getPlayerName(detail.match.awayTeamId, e.playerId) }}
+                            <span><strong>¡GOL!</strong> {{ getPlayerName(detail.match.awayTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.awayTeamId) }})</span>
+                          } @else if (e.type === 'red') {
+                            <span><strong>¡EXPULSADO!</strong> {{ getPlayerName(detail.match.awayTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.awayTeamId) }})</span>
                           } @else {
-                            {{ getPlayerName(detail.match.awayTeamId, e.playerId) }}
+                            <span>{{ getPlayerName(detail.match.awayTeamId, e.playerId) }} ({{ getTeamShortName(detail.match.awayTeamId) }})</span>
                           }
                           @if (e.assistId) {
                             <span class="ev-assist">(Asist: {{ getPlayerName(detail.match.awayTeamId, e.assistId) }})</span>
@@ -469,7 +477,7 @@
             </div>
           }
 
-          <!-- TAB 2: COMENTARIOS MINUTO A MINUTO (mismo relato que SimularPartido) -->
+          <!-- TAB 2: COMENTARIOS MINUTO A MINUTO -->
           @if (activeDetailTab() === 'comentarios') {
             <div class="commentary-feed">
               <div class="commentary-system-row end">

@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Users } from '../models/users';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { GameStateService } from '../menu-jugar/game-state-service';
 
 @Component({
   selector: 'app-menu',
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
 export class MenuComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private gameState = inject(GameStateService);
 
   isModalOpen = signal(false);
   newSaveName = signal('');
@@ -27,6 +29,7 @@ export class MenuComponent {
   }
 
   logout() {
+    this.gameState.clearActiveGame();
     this.auth.logout();
     this.router.navigate(['/login']);
   }

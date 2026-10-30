@@ -13,16 +13,26 @@ export class EstadisticasEquipo {
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
-  private readonly location = inject(Location);
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
   private readonly gameState = inject(GameStateService);
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
+
+  constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+  }
 
   goBack() {
     this.router.navigate(['/inicio', this.teamId]);
   }
 
   team = computed(() => {
-    const id = this.gameState.selectedTeamId() ?? this.teamId;
+    const id = Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
     if (!id) return null;
     return this.gameState.getTeamById(id) ?? null;
   });

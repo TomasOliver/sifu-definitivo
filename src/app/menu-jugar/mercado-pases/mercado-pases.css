@@ -601,11 +601,38 @@
   border-color: rgba(180, 230, 41, 0.5);
 }
 
+.slot-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .slot-label {
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   color: rgba(186, 212, 194, 0.72);
+}
+
+.slot-clear-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(94, 152, 108, 0.3);
+  color: #ffffff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.slot-clear-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
 }
 
 .slot-player-info {
@@ -879,15 +906,25 @@
   border-left-color: #ef4444;
 }
 
+.h-status {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
 .h-names {
   flex: 1;
   color: #e9f2ec;
   font-weight: 600;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .h-prob {
   color: rgba(186, 212, 194, 0.75);
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .empty-list {

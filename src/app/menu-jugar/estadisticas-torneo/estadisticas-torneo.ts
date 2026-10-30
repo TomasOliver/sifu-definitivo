@@ -2,7 +2,12 @@ import { Component, computed, inject } from '@angular/core';
 import { GameStateService } from '../game-state-service';
 import { Player } from '../../models/player';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
+
+export interface PlayerWithTeam extends Player {
+  teamId: number;
+  teamName: string;
+  teamShortName: string;
+}
 
 @Component({
   selector: 'app-estadisticas-torneo',
@@ -16,15 +21,42 @@ export class EstadisticasTorneo {
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
-  private readonly location = inject(Location);
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id'));
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
+
+  constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+  }
 
   goBack() {
     this.router.navigate(['/inicio', this.teamId]);
   }
 
-  private readonly allPlayers = computed<Player[]>(() =>
-    this.gameState.teams().flatMap(t => t.squad)
+  getTeamLogo(teamId: number | string): string {
+    return `/logos/${teamId}.png`;
+  }
+
+  handleMissingImage(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
+    imgElement.src = '/logos/default.png';
+  }
+
+  private readonly allPlayers = computed<PlayerWithTeam[]>(() =>
+    this.gameState.teams().flatMap(t =>
+      (t.squad ?? []).map(p => ({
+        ...p,
+        teamId: Number(t.id),
+        teamName: t.name,
+        teamShortName: t.shortName,
+      }))
+    )
   );
 
   topGoals = computed(() =>

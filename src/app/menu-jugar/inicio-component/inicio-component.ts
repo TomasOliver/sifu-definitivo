@@ -22,10 +22,14 @@ export class InicioComponent {
   private readonly location = inject(Location);
   private readonly gameState = inject(GameStateService);
 
-  protected readonly teamId = computed(() => this.gameState.selectedTeamId() ?? Number(this.route.snapshot.paramMap.get('id')));
+  protected readonly teamId = computed(() => Number(this.gameState.selectedTeamId() ?? this.route.snapshot.paramMap.get('id')));
   protected readonly teams = computed(() => this.gameState.getState()?.teams ?? []);
 
   constructor() {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
   }
 
   navigateToMenuSimulacion(id: number) {
@@ -139,28 +143,30 @@ export class InicioComponent {
 
   handleMissingImage(event: Event) {
     const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
     imgElement.src = '/logos/default.png'; 
   }
 
   simulateFullSeason() {
-  const fixture = this.gameState.fixture();
+    if (this.isSeasonFinished()) return;
+    const fixture = this.gameState.fixture();
 
-  // iterar por los partidos NO jugados
-  for (const match of fixture) {
-    if (!match.played) {
-      const home = this.gameState.getTeamById(match.homeTeamId);
-      const away = this.gameState.getTeamById(match.awayTeamId);
+    // iterar por los partidos NO jugados
+    for (const match of fixture) {
+      if (!match.played) {
+        const home = this.gameState.getTeamById(match.homeTeamId);
+        const away = this.gameState.getTeamById(match.awayTeamId);
 
-      if (!home || !away) continue;
+        if (!home || !away) continue;
 
-      const result = simulateFullMatch(match, home, away);
+        const result = simulateFullMatch(match, home, away);
 
-      // actualizar estado global
-      this.gameState.updateMatchResult(match.id, result);
+        // actualizar estado global
+        this.gameState.updateMatchResult(match.id, result);
+      }
     }
-  }
 
-  this.gameState.persistCurrentSave();
-}
+    this.gameState.persistCurrentSave();
+  }
 
 }

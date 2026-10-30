@@ -5,7 +5,6 @@ import { Match } from '../models/match';
 import { LeagueStanding } from '../models/league-standing';
 import { MatchEvent } from '../models/match-event';
 import { Player } from '../models/player';
-import { TeamsService } from '../equipos/teams-service';
 import { SavesService } from '../lista-partidas-guardadas/saves-service';
 import { Saves, TransferHistoryEntry } from '../models/saves';
 
@@ -15,7 +14,6 @@ import { Saves, TransferHistoryEntry } from '../models/saves';
 export class GameStateService {
 
   private readonly savesService = inject(SavesService);
-  private readonly teamsService = inject(TeamsService);
 
   readonly currentSave = signal<Saves | null>(null);
   readonly selectedTeamId = signal<number | null>(null);
@@ -36,17 +34,35 @@ export class GameStateService {
     return allowed;
   }
 
+  hasActiveOrRestorableSave(): boolean {
+    return !!this.currentSave() || !!localStorage.getItem('activeSaveId');
+  }
+
   constructor() {
     const activeSaveId = localStorage.getItem('activeSaveId');
     if (activeSaveId) {
+      // Hidratación instantánea desde backup local si existe (evita parpadeos al apretar F5)
+      const instantBackup = this.savesService.getInstantLocalBackup(activeSaveId);
+      if (instantBackup) {
+        this.loadSave(instantBackup);
+      }
+
       this.savesService.getSaveById(activeSaveId).subscribe({
         next: (save) => {
-          if (save && !this.currentSave()) {
-            this.loadSave(save);
+          if (!save) return;
+          const current = this.currentSave();
+          if (!current || String(current.id) === String(activeSaveId)) {
+            const currentUpdated = new Date(current?.updatedAt ?? 0).getTime();
+            const fetchedUpdated = new Date(save.updatedAt ?? 0).getTime();
+            if (!current || fetchedUpdated > currentUpdated) {
+              this.loadSave(save);
+            }
           }
         },
         error: () => {
-          localStorage.removeItem('activeSaveId');
+          if (!this.currentSave()) {
+            localStorage.removeItem('activeSaveId');
+          }
         }
       });
     }
@@ -62,8 +78,12 @@ export class GameStateService {
     // Aseguramos copia profunda para evitar mutaciones compartidas en memoria
     const saveCopy: Saves = JSON.parse(JSON.stringify(save));
     this.currentSave.set(saveCopy);
-    localStorage.setItem('activeSaveId', String(saveCopy.id));
-    localStorage.setItem(`save_backup_${saveCopy.id}`, JSON.stringify(saveCopy));
+    try {
+      localStorage.setItem('activeSaveId', String(saveCopy.id));
+    } catch {
+      // Ignorar si el navegador restringe almacenamiento
+    }
+    this.savesService.saveLocalBackup(saveCopy);
 
     this.selectedTeamId.set(Number(saveCopy.teamId));
     this.teams.set(saveCopy.modifiedTeams);
@@ -88,7 +108,12 @@ export class GameStateService {
     this.standings.set([]);
     this.transferAttemptsLeft.set(10);
     this.transferHistory.set([]);
-    localStorage.removeItem('activeSaveId');
+    this.simulationAuthorized = false;
+    try {
+      localStorage.removeItem('activeSaveId');
+    } catch {
+      // Ignorar
+    }
   }
 
   // NUEVA PARTIDA
@@ -133,8 +158,7 @@ export class GameStateService {
     }));
 
     this.currentSave.set(updatedSave);
-    // Respaldo instantáneo local para no perder cambios si el usuario cierra sesión o recarga de inmediato
-    localStorage.setItem(`save_backup_${updatedSave.id}`, JSON.stringify(updatedSave));
+    this.savesService.saveLocalBackup(updatedSave);
 
     const save$ = this.savesService.updateSave(updatedSave);
     save$.subscribe({
@@ -148,7 +172,6 @@ export class GameStateService {
 
     return save$;
   }
-
 
   // TABLA INICIAL
   createInitialStandings(teams: Teams[]): LeagueStanding[] {
@@ -189,11 +212,9 @@ export class GameStateService {
     });
   }
 
-
-
   // RESULTADOS
   updateMatchResult(
-    matchId: number, 
+    matchId: number,
     result: { homeGoals: number; awayGoals: number; events: MatchEvent[] }
   ) {
     const updatedFixture = this.fixture().map(m => {
@@ -224,9 +245,6 @@ export class GameStateService {
     // Emitir nueva referencia de teams para que los signals dependientes se enteren
     this.teams.set([...this.teams()]);
   }
-
-
-
 
   // RECONSTRUIR TABLA DESDE CERO
   private recalculateStandings() {
@@ -279,7 +297,7 @@ export class GameStateService {
     this.standings.set(table);
   }
 
-  // OBTENER ESTADO COMPLETO 
+  // OBTENER ESTADO COMPLETO
   getState() {
     return {
       selectedTeamId: this.selectedTeamId(),
@@ -340,7 +358,7 @@ export class GameStateService {
         targetPlayerName: targetPlayer.name,
         targetPlayerRating: targetPlayer.rating,
         targetPlayerPosition: targetPlayer.position ?? 'MF',
-        targetTeamId: targetTeam.id,
+        targetTeamId: Number(targetTeam.id),
         targetTeamName: targetTeam.name,
         probability: params.probability,
         accepted: params.accepted,
@@ -355,11 +373,13 @@ export class GameStateService {
 
       const incomingToMyTeam: Player = {
         ...targetPlayer,
+        stats: { ...targetPlayer.stats },
         isStarter: myPlayerWasStarter
       };
 
       const outgoingToTargetTeam: Player = {
         ...myPlayer,
+        stats: { ...myPlayer.stats },
         isStarter: targetPlayerWasStarter
       };
 

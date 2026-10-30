@@ -41,16 +41,16 @@
 
             <div class="texto">
               @if (e.type === 'goal') {
-                <strong>¡GOL!</strong> {{ getPlayerName(homeTeam, e.playerId) }}
+                <strong>¡GOL!</strong> {{ getPlayerName(homeTeam, e.playerId) }} ({{ homeTeam?.shortName }})
               } 
               @else if (e.type === 'yellow') {
-                 {{ getPlayerName(homeTeam, e.playerId) }}
+                 {{ getPlayerName(homeTeam, e.playerId) }} ({{ homeTeam?.shortName }})
               }
               @else if (e.type === 'red') {
-                 {{ getPlayerName(homeTeam, e.playerId) }}
+                 {{ getPlayerName(homeTeam, e.playerId) }} ({{ homeTeam?.shortName }})
               }
               @else {
-                {{ getPlayerName(homeTeam, e.playerId) }}
+                {{ getPlayerName(homeTeam, e.playerId) }} ({{ homeTeam?.shortName }})
               }
 
               @if (e.assistId) {
@@ -86,16 +86,16 @@
 
             <div class="texto">
               @if (e.type === 'goal') {
-                <strong>¡GOL!</strong> {{ getPlayerName(awayTeam, e.playerId) }}
+                <strong>¡GOL!</strong> {{ getPlayerName(awayTeam, e.playerId) }} ({{ awayTeam?.shortName }})
               } 
               @else if (e.type === 'yellow') {
-                {{ getPlayerName(awayTeam, e.playerId) }}
+                {{ getPlayerName(awayTeam, e.playerId) }} ({{ awayTeam?.shortName }})
               }
               @else if (e.type === 'red') {
-                {{ getPlayerName(awayTeam, e.playerId) }}
+                {{ getPlayerName(awayTeam, e.playerId) }} ({{ awayTeam?.shortName }})
               }
               @else {
-                {{ getPlayerName(awayTeam, e.playerId) }}
+                {{ getPlayerName(awayTeam, e.playerId) }} ({{ awayTeam?.shortName }})
               }
 
               @if (e.assistId) {

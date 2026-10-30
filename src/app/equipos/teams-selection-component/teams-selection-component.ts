@@ -47,6 +47,7 @@ export class TeamsSelectionComponent {
 
   //filtrado
   protected searchTerm = signal<string>('');
+  protected isCreatingSave = signal<boolean>(false);
 
   protected readonly filteredTeams = computed(() => {
     const teams = this.teamsSource() ?? [];
@@ -59,6 +60,8 @@ export class TeamsSelectionComponent {
   });
 
 private inicializarPartida(equipoSeleccionado: Teams) {
+    if (this.isCreatingSave()) return;
+
     const currentUser = this.auth.getUser();
     const todosLosEquipos = this.teamsSource(); 
 
@@ -71,6 +74,8 @@ private inicializarPartida(equipoSeleccionado: Teams) {
       alert('Error: Los equipos aún no han cargado.');
       return;
     }
+
+    this.isCreatingSave.set(true);
 
     // generamos el Fixture usando tu utilidad
     // usamos una copia para generar el fixture para no mutar el original todavía
@@ -101,13 +106,12 @@ private inicializarPartida(equipoSeleccionado: Teams) {
 
     this.savesService.createSave(nuevaPartida).subscribe({
       next: (saveCreado) => {
-        console.log('Partida guardada en DB:', saveCreado);
-        
+        this.isCreatingSave.set(false);
         this.gameState.loadSave(saveCreado);
-
         this.router.navigate(['/inicio', saveCreado.teamId]);
       },
       error: (err) => {
+        this.isCreatingSave.set(false);
         console.error('Error al crear partida:', err);
         alert('Hubo un error al guardar la partida. Intenta nuevamente.');
       }

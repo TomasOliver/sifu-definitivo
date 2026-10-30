@@ -51,6 +51,11 @@
 
         <div class="stand-box my-team">
           <h3>Tu Equipo</h3>
+          <img
+            class="stand-team-crest"
+            [src]="getTeamLogo(teamId())"
+            [alt]="myTeamName()"
+            (error)="handleMissingImage($event)" />
           <p class="team-name">{{ myTeamName() }}</p>
 
           <div class="position-tag">
@@ -61,6 +66,11 @@
 
         <div class="stand-box rival-team">
           <h3>Rival</h3>
+          <img
+            class="stand-team-crest"
+            [src]="getTeamLogo(nextMatch()!.rivalTeamId)"
+            [alt]="nextMatch()?.rivalTeamName"
+            (error)="handleMissingImage($event)" />
           <p class="team-name">{{ nextMatch()?.rivalTeamName }}</p>
 
           <div class="position-tag">
@@ -95,7 +105,7 @@
         <div class="icon">⚽</div>
       </div>
 
-      <div class="menu-option auto-sim" (click)="simulateFullSeason()" [class.disabled]="isSeasonFinished()">
+      <div class="menu-option auto-sim" (click)="!isSeasonFinished() && simulateFullSeason()" [class.disabled]="isSeasonFinished()">
         <div class="option-content">
           <h2>SIMULAR TODA LA TEMPORADA</h2>
           <span>Simula automáticamente todos los partidos restantes</span>

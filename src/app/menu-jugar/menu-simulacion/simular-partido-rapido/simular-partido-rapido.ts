@@ -17,7 +17,12 @@ export class SimularPartidoRapido {
   score = signal({ home: 0, away: 0 });
   protected readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly teamId = Number(this.route.snapshot.paramMap.get('id') ?? 0);
+  private readonly routeTeamId = Number(this.route.snapshot.paramMap.get('id') ?? 0);
+
+  protected get teamId(): number {
+    return Number(this.gameState.selectedTeamId() ?? this.routeTeamId);
+  }
+
   private readonly location = inject(Location);
   match: any;
   homeTeam?: Teams;
@@ -25,6 +30,11 @@ export class SimularPartidoRapido {
   private initialized = false;
 
   constructor(private gameState: GameStateService) {
+    if (!this.gameState.hasActiveOrRestorableSave()) {
+      this.router.navigate(['/menu']);
+      return;
+    }
+
     // Si el usuario recarga con F5 o entra sin pasar por el botón de simular,
     // redirigimos al menú de inicio para no simular otra fecha por accidente
     if (!this.gameState.consumeMatchSimulationAuthorization()) {
@@ -99,7 +109,7 @@ export class SimularPartidoRapido {
       .find((m) => !m.played && (Number(m.homeTeamId) === Number(teamId) || Number(m.awayTeamId) === Number(teamId)))!;
   }
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
   navigateToMenuInicio(id : number) {
     this.router.navigateByUrl(`/inicio/${id}`);
