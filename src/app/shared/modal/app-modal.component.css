@@ -1,0 +1,171 @@
+.sifu-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(2, 10, 6, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: sifuBackdropIn 0.2s ease-out;
+}
+
+@keyframes sifuBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sifu-modal-card {
+  width: 100%;
+  max-width: 430px;
+  background: linear-gradient(180deg, rgba(10, 34, 21, 0.97) 0%, rgba(5, 19, 11, 0.98) 100%);
+  border: 1px solid rgba(180, 230, 41, 0.42);
+  border-top: 4px solid #b4e629;
+  border-radius: 18px;
+  padding: 1.85rem 1.75rem 1.6rem;
+  text-align: center;
+  color: #f4f7f5;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 32px rgba(180, 230, 41, 0.14);
+  animation: sifuCardIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sifu-modal-card[data-variant="danger"],
+.sifu-modal-card[data-variant="error"] {
+  border-color: rgba(255, 107, 107, 0.45);
+  border-top-color: #ff6b6b;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 32px rgba(255, 107, 107, 0.16);
+}
+
+.sifu-modal-card[data-variant="warning"] {
+  border-color: rgba(255, 213, 79, 0.45);
+  border-top-color: #ffd54f;
+}
+
+@keyframes sifuCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.sifu-modal-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  margin: 0 auto 0.85rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  font-weight: 900;
+  background: rgba(180, 230, 41, 0.14);
+  border: 2px solid rgba(180, 230, 41, 0.55);
+  color: #b4e629;
+  box-shadow: 0 0 20px rgba(180, 230, 41, 0.2);
+}
+
+.sifu-modal-icon[data-variant="danger"],
+.sifu-modal-icon[data-variant="error"] {
+  background: rgba(255, 107, 107, 0.14);
+  border-color: rgba(255, 107, 107, 0.55);
+  color: #ff6b6b;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.2);
+}
+
+.sifu-modal-icon[data-variant="warning"] {
+  background: rgba(255, 213, 79, 0.14);
+  border-color: rgba(255, 213, 79, 0.55);
+  color: #ffd54f;
+  box-shadow: 0 0 20px rgba(255, 213, 79, 0.18);
+}
+
+.sifu-modal-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b4e629;
+  background: rgba(180, 230, 41, 0.1);
+  border: 1px solid rgba(180, 230, 41, 0.28);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 0.65rem;
+}
+
+.sifu-modal-title {
+  font-family: 'Orbitron', 'Inter', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin: 0 0 0.6rem 0;
+}
+
+.sifu-modal-message {
+  margin: 0 0 1.45rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(226, 240, 231, 0.88);
+}
+
+.sifu-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.sifu-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.78rem 1.2rem;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sifu-btn-cancel {
+  background: rgba(8, 28, 18, 0.8);
+  border: 1px solid rgba(140, 185, 152, 0.35);
+  color: rgba(235, 245, 238, 0.88);
+}
+
+.sifu-btn-cancel:hover {
+  background: rgba(18, 52, 34, 0.9);
+  border-color: rgba(180, 230, 41, 0.5);
+  color: #ffffff;
+}
+
+.sifu-btn-confirm {
+  background: linear-gradient(90deg, #b4e629 0%, #c4f035 50%, #aee226 100%);
+  border: none;
+  color: #07190e;
+  box-shadow: 0 6px 18px rgba(180, 230, 41, 0.28);
+}
+
+.sifu-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(180, 230, 41, 0.4);
+}
+
+.sifu-btn-confirm.danger {
+  background: linear-gradient(90deg, #e53935 0%, #ff5252 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(229, 57, 53, 0.32);
+}
+
+.sifu-btn-confirm.danger:hover {
+  box-shadow: 0 10px 24px rgba(229, 57, 53, 0.45);
+}

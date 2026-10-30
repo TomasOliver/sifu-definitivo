@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { Router } from '@angular/router';
+import { AppModalComponent } from './shared/modal/app-modal.component';
 
 @Component({
   selector: 'app-root',
   
-  imports: [RouterOutlet, FormsModule],
+  imports: [RouterOutlet, FormsModule, AppModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

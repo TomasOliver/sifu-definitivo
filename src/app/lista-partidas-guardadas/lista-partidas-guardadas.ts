@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Saves } from '../models/saves';
 import { CommonModule, DatePipe } from '@angular/common';
 import { GameStateService } from '../menu-jugar/game-state-service';
+import { ModalService } from '../shared/modal/modal.service';
 
 @Component({
   selector: 'app-lista-partidas-guardadas',
@@ -20,6 +21,7 @@ export class ListaPartidasGuardadas {
   private authService = inject(AuthService);
   private router = inject(Router);
   private gameState = inject(GameStateService);
+  private modal = inject(ModalService);
 
   // signals para el estado
   saves = signal<Saves[]>([]);
@@ -86,8 +88,14 @@ export class ListaPartidasGuardadas {
     this.router.navigate(['/inicio', save.teamId]);
   }
 
-  eliminarPartida(save: Saves) {
-    const confirmacion = confirm(`¿Seguro que deseas eliminar la partida "${save.nameSave}"?`);
+  async eliminarPartida(save: Saves) {
+    const confirmacion = await this.modal.confirm({
+      title: 'Eliminar partida',
+      message: `¿Seguro que deseás eliminar definitivamente la partida "${save.nameSave}"? Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+    });
 
     if (!confirmacion) return;
 
@@ -102,7 +110,12 @@ export class ListaPartidasGuardadas {
       },
       error: (err) => {
         console.error("Error al eliminar partida", err);
-        alert("Hubo un error al eliminar la partida.");
+        this.modal.alert({
+          title: 'Error al eliminar',
+          message: 'Hubo un problema al intentar eliminar la partida.',
+          variant: 'error',
+          confirmText: 'Aceptar',
+        });
       }
     });
   }

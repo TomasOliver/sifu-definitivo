@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth-service';
+import { ModalService } from '../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-menu-admin',
@@ -11,9 +12,15 @@ import { AuthService } from '../../auth/auth-service';
 export class MenuAdmin {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private modal = inject(ModalService);
 
   alertaFutura() {
-    alert("Funcionalidad 'Resetear Temporada' próximamente...");
+    this.modal.alert({
+      title: 'Próximamente',
+      message: "La funcionalidad 'Resetear Temporada' estará disponible en una próxima actualización.",
+      variant: 'info',
+      confirmText: 'Entendido',
+    });
   }
 
   logout() {

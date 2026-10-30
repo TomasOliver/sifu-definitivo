@@ -5,6 +5,7 @@ import { Users } from '../models/users';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GameStateService } from '../menu-jugar/game-state-service';
+import { ModalService } from '../shared/modal/modal.service';
 
 @Component({
   selector: 'app-menu',
@@ -17,6 +18,7 @@ export class MenuComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private gameState = inject(GameStateService);
+  private modal = inject(ModalService);
 
   isModalOpen = signal(false);
   newSaveName = signal('');
@@ -44,7 +46,12 @@ export class MenuComponent {
 
   continueToTeamSelection() {
     if (!this.newSaveName().trim()) {
-      alert('Por favor escribe un nombre para la partida');
+      this.modal.alert({
+        title: 'Nombre requerido',
+        message: 'Por favor escribí un nombre para identificar tu nueva partida antes de continuar.',
+        variant: 'warning',
+        confirmText: 'Entendido',
+      });
       return;
     }
 

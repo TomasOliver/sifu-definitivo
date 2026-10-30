@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TeamsService } from '../../equipos/teams-service';
 import { Player } from '../../models/player';
 import { Location } from '@angular/common';
+import { ModalService } from '../../shared/modal/modal.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class FormAgregarJugador {
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
   private location = inject(Location);
+  private readonly modal = inject(ModalService);
 
 
   public readonly jugadorAgregadoOModificado = output<Player>();
@@ -198,10 +200,15 @@ export class FormAgregarJugador {
     return this.form.controls.isStarter
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      alert(`FORMULARIO INVALIDO!!!!`);
+      await this.modal.alert({
+        title: 'Formulario inválido',
+        message: 'Por favor revisá y completá todos los campos obligatorios con valores válidos.',
+        variant: 'warning',
+        confirmText: 'Revisar',
+      });
       return;
     }
 
@@ -222,15 +229,28 @@ export class FormAgregarJugador {
 
     const accion = this.esModoEdicion() ? 'editar' : 'crear';
 
-    if (confirm(`¿Desea ${accion} los datos?`)) {
+    const confirmado = await this.modal.confirm({
+      title: this.esModoEdicion() ? 'Confirmar edición' : 'Confirmar creación',
+      message: `¿Deseás ${accion} los datos de ${nuevoJugador.name}?`,
+      variant: 'info',
+      confirmText: 'Sí, guardar',
+      cancelText: 'Cancelar',
+    });
+
+    if (confirmado) {
 
       const idEquipo = Number(rawValues.teamId);
 
       if (!this.esModoEdicion()) {
         this.service.addPlayerToTeam(idEquipo, nuevoJugador).subscribe({
-          next: (team) => {
+          next: () => {
             this.jugadorAgregadoOModificado.emit(nuevoJugador);
-            alert('Jugador Creado!');
+            this.modal.alert({
+              title: '¡Jugador creado!',
+              message: `${nuevoJugador.name} fue incorporado al plantel correctamente.`,
+              variant: 'success',
+              confirmText: 'Aceptar',
+            });
             this.form.reset();
             // Reiniciar stats por si se agrega otro seguido
             this.currentStats = { goals: 0, assists: 0, matches: 0, starts: 0, yellowCards: 0, redCards: 0 };
@@ -240,8 +260,14 @@ export class FormAgregarJugador {
       } else {
         this.service.updatePlayer(idEquipo, nuevoJugador).subscribe({
           next: () => {
-            alert('Jugador Editado Correctamente!');
-            this.router.navigate(['/menuAdmin/db']);
+            this.modal.alert({
+              title: '¡Jugador actualizado!',
+              message: `Los datos de ${nuevoJugador.name} fueron editados correctamente.`,
+              variant: 'success',
+              confirmText: 'Continuar',
+            }).then(() => {
+              this.router.navigate(['/menuAdmin/db']);
+            });
           },
           error: (err) => console.error('Error al editar', err)
         });

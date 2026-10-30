@@ -10,6 +10,7 @@ import { generateFixture } from '../../utils/generate-fixture';
 import { AuthService } from '../../auth/auth-service';
 import { SavesService } from '../../lista-partidas-guardadas/saves-service';
 import { Saves } from '../../models/saves';
+import { ModalService } from '../../shared/modal/modal.service';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class TeamsSelectionComponent {
   private readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
   private readonly gameState = inject(GameStateService);
   private readonly auth = inject(AuthService);
+  private readonly modal = inject(ModalService);
 
   protected saveName: string | null = null;
 
@@ -66,12 +68,23 @@ private inicializarPartida(equipoSeleccionado: Teams) {
     const todosLosEquipos = this.teamsSource(); 
 
     if (!currentUser) {
-      alert('Error: Debes iniciar sesión para crear una partida.');
-      this.router.navigate(['/login']);
+      this.modal.alert({
+        title: 'Sesión requerida',
+        message: 'Debés iniciar sesión para crear una partida.',
+        variant: 'error',
+        confirmText: 'Ir a Iniciar Sesión',
+      }).then(() => {
+        this.router.navigate(['/login']);
+      });
       return;
     }
     if (!todosLosEquipos) {
-      alert('Error: Los equipos aún no han cargado.');
+      this.modal.alert({
+        title: 'Cargando equipos',
+        message: 'Los equipos aún están cargando. Intentá nuevamente en unos segundos.',
+        variant: 'warning',
+        confirmText: 'Entendido',
+      });
       return;
     }
 
@@ -113,7 +126,12 @@ private inicializarPartida(equipoSeleccionado: Teams) {
       error: (err) => {
         this.isCreatingSave.set(false);
         console.error('Error al crear partida:', err);
-        alert('Hubo un error al guardar la partida. Intenta nuevamente.');
+        this.modal.alert({
+          title: 'Error al guardar',
+          message: 'Hubo un problema al guardar la partida. Por favor intentá nuevamente.',
+          variant: 'error',
+          confirmText: 'Aceptar',
+        });
       }
     });
   }

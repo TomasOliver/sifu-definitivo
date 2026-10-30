@@ -1,0 +1,41 @@
+@if (modal(); as m) {
+  <div class="sifu-modal-backdrop" (click)="onCancel()">
+    <div
+      class="sifu-modal-card"
+      [attr.data-variant]="m.variant"
+      role="dialog"
+      aria-modal="true"
+      (click)="$event.stopPropagation()">
+
+      <div class="sifu-modal-icon" [attr.data-variant]="m.variant">
+        @switch (m.variant) {
+          @case ('success') { ✓ }
+          @case ('error') { ✕ }
+          @case ('danger') { 🗑️ }
+          @case ('warning') { ⚠️ }
+          @default { ⚽ }
+        }
+      </div>
+
+      <span class="sifu-modal-badge">S.I.F.U. SYSTEM</span>
+      <h3 class="sifu-modal-title">{{ m.title }}</h3>
+      <p class="sifu-modal-message">{{ m.message }}</p>
+
+      <div class="sifu-modal-actions">
+        @if (m.mode === 'confirm') {
+          <button type="button" class="sifu-btn sifu-btn-cancel" (click)="onCancel()">
+            {{ m.cancelText || 'Cancelar' }}
+          </button>
+        }
+        <button
+          type="button"
+          class="sifu-btn sifu-btn-confirm"
+          [class.danger]="m.variant === 'danger' || m.variant === 'error'"
+          (click)="onConfirm()">
+          {{ m.confirmText }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

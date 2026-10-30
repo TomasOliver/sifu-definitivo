@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TeamsService } from '../../equipos/teams-service';
 import { Player } from '../../models/player';
+import { ModalService } from '../../shared/modal/modal.service';
 
 
 interface PlayerRow extends Player {
@@ -21,6 +22,7 @@ export class ManageDB {
 
   private readonly service = inject(TeamsService)
   private readonly router = inject(Router)
+  private readonly modal = inject(ModalService);
 
   searchTerm = signal('');
 
@@ -60,8 +62,16 @@ export class ManageDB {
     });
   }
 
-  deletePlayer(player: PlayerRow) {
-    if(confirm(`¿Estás seguro de eliminar a ${player.name} del ${player.teamName}?`)) {
+  async deletePlayer(player: PlayerRow) {
+    const confirmado = await this.modal.confirm({
+      title: 'Eliminar jugador',
+      message: `¿Estás seguro de eliminar a ${player.name} del ${player.teamName}?`,
+      variant: 'danger',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+    });
+
+    if (confirmado) {
       
       this.service.deletePlayerFromTeam(player.teamId, player.id!).subscribe({
         next: () => {
@@ -69,9 +79,21 @@ export class ManageDB {
           this.allPlayers.update(current => 
             current.filter(p => p.id !== player.id)
           );
-          alert('Jugador eliminado.');
+          this.modal.alert({
+            title: 'Jugador eliminado',
+            message: `${player.name} fue eliminado de la base de datos correctamente.`,
+            variant: 'success',
+            confirmText: 'Aceptar',
+          });
         },
-        error: (e) => alert('Error al eliminar')
+        error: () => {
+          this.modal.alert({
+            title: 'Error al eliminar',
+            message: 'No se pudo eliminar al jugador. Intentá nuevamente.',
+            variant: 'error',
+            confirmText: 'Aceptar',
+          });
+        }
       });
     }
   }
