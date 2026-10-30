@@ -45,6 +45,22 @@ export class SavesService {
     return shared$;
   }
 
+  private mergeWithLocalBackup(save: Saves): Saves {
+    try {
+      const raw = localStorage.getItem(`save_backup_${save.id}`);
+      if (!raw) return save;
+      const localSave = JSON.parse(raw) as Saves;
+      const remoteTime = new Date(save.updatedAt ?? 0).getTime();
+      const localTime = new Date(localSave.updatedAt ?? 0).getTime();
+      if (localTime >= remoteTime) {
+        return localSave;
+      }
+    } catch {
+      // ignorar si localStorage no está disponible o JSON inválido
+    }
+    return save;
+  }
+
   getSaveById(id: string | number): Observable<Saves> {
     const wait$ = this.pendingUpdate$
       ? this.pendingUpdate$.pipe(catchError(() => of(null)))
@@ -58,7 +74,7 @@ export class SavesService {
             if (!docSnap.exists()) {
               throw new Error('Partida no encontrada');
             }
-            return docSnap.data() as Saves;
+            return this.mergeWithLocalBackup(docSnap.data() as Saves);
           })
         );
       })
@@ -74,13 +90,14 @@ export class SavesService {
       switchMap(() => {
         const q = query(this.savesCol, where('userId', '==', String(userId)));
         return from(getDocs(q)).pipe(
-          map(snapshot => snapshot.docs.map(d => d.data() as Saves))
+          map(snapshot => snapshot.docs.map(d => this.mergeWithLocalBackup(d.data() as Saves)))
         );
       })
     );
   }
 
   deleteSave(id: string | number): Observable<void> {
+    localStorage.removeItem(`save_backup_${id}`);
     const saveRef = doc(firestoreDb, 'saves', String(id));
     return from(deleteDoc(saveRef));
   }

@@ -17,6 +17,7 @@ import { SimularPartido } from './menu-jugar/menu-simulacion/simular-partido/sim
 import { SimularPartidoRapido } from './menu-jugar/menu-simulacion/simular-partido-rapido/simular-partido-rapido';
 import { EstadisticasEquipo } from './menu-jugar/estadisticas-equipo/estadisticas-equipo';
 import { EstadisticasTorneo } from './menu-jugar/estadisticas-torneo/estadisticas-torneo';
+import { MercadoPases } from './menu-jugar/mercado-pases/mercado-pases';
 import { LoginGuard } from './guards/login-guard';
 import { ManageDB } from './admin/manage-db/manage-db';
 import { PlayerGuard } from './guards/player-guard';
@@ -64,6 +65,11 @@ export const routes: Routes = [
     path: 'plantilla/:id',
     canActivate: [AuthGuard, PlayerGuard],
     component: PlantillaComponent
+  },
+  {
+    path: 'mercadoPases/:id',
+    canActivate: [AuthGuard, PlayerGuard],
+    component: MercadoPases
   },
   {
     path: 'menuAdmin',

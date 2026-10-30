@@ -37,6 +37,7 @@ export class InicioComponent {
   }
 
   logout() {
+    this.gameState.clearActiveGame();
     this.auth.logout();
     this.router.navigate(['/login']);
   }

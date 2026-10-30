@@ -94,7 +94,9 @@ private inicializarPartida(equipoSeleccionado: Teams) {
       fixture: nuevoFixture, 
       
       // clonamos los equipos para que esta partida tenga sus propios jugadores
-      modifiedTeams: JSON.parse(JSON.stringify(todosLosEquipos)) 
+      modifiedTeams: JSON.parse(JSON.stringify(todosLosEquipos)),
+      transferAttemptsLeft: 10,
+      transferHistory: []
     };
 
     this.savesService.createSave(nuevaPartida).subscribe({

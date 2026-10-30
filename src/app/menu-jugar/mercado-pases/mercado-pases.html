@@ -1,0 +1,304 @@
+<nav class="game-navbar">
+  <div class="nav-brand">
+    <span>S.I.F.U.</span>
+  </div>
+
+  <div class="nav-links">
+    <a [routerLink]="['/inicio', teamId]">Inicio</a>
+    <a [routerLink]="['/plantilla', teamId]">Plantilla</a>
+    <a [routerLink]="['/mercadoPases', teamId]" class="active">Mercado de Pases</a>
+    <a [routerLink]="['/fixture', teamId]">Fixture</a>
+    <a [routerLink]="['/tabla', teamId]">Tabla</a>
+    <a [routerLink]="['/estadisticasEquipo', teamId]">Estadísticas Equipo</a>
+    <a [routerLink]="['/estadisticasTorneo', teamId]">Estadísticas Torneo</a>
+  </div>
+
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="toolbar">
+  <button class="btn-volver" (click)="goBack()">
+    <span class="arrow">&larr;</span> Volver
+  </button>
+
+  <!-- Contador de intentos de traspaso por ciclo de juego -->
+  <div class="attempts-counter-pill" [class.depleted]="attemptsLeft() === 0" [class.warning]="attemptsLeft() > 0 && attemptsLeft() <= 3">
+    <div class="counter-info">
+      <span class="counter-label">Intentos de Traspaso Restantes</span>
+      <div class="counter-dots">
+        @for (dot of [1,2,3,4,5,6,7,8,9,10]; track dot) {
+          <span class="attempt-dot" [class.active]="dot <= attemptsLeft()"></span>
+        }
+      </div>
+    </div>
+    <div class="counter-badge">
+      <span class="current-num">{{ attemptsLeft() }}</span>
+      <span class="max-num">/ {{ maxAttempts }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="market-container">
+  <header class="page-header">
+    <h2>Mercado de Pases · Intercambio de Jugadores</h2>
+    <p class="page-subtitle">
+      Seleccioná un jugador de tu plantel y uno del club rival para proponer un trueque directo basado en probabilidad según su media.
+    </p>
+  </header>
+
+  <!-- Notificación de resultado de negociación -->
+  @if (negotiationFeedback(); as fb) {
+    <div class="feedback-banner" [class.success]="fb.accepted" [class.rejected]="!fb.accepted">
+      <div class="feedback-icon">
+        @if (fb.accepted) { ✅ } @else { ❌ }
+      </div>
+      <div class="feedback-content">
+        <h4>{{ fb.title }} <span class="prob-tag">({{ fb.probability }}% prob.)</span></h4>
+        <p>{{ fb.message }}</p>
+      </div>
+      <button type="button" class="feedback-close" (click)="negotiationFeedback.set(null)">&times;</button>
+    </div>
+  }
+
+  <!-- Filtros rápidos por posición -->
+  <div class="position-filters-bar">
+    <span class="filter-title">Filtrar por posición:</span>
+    <div class="pos-filter-buttons">
+      <button type="button" [class.active]="filterPosition() === 'ALL'" (click)="setPositionFilter('ALL')">Todos</button>
+      <button type="button" [class.active]="filterPosition() === 'GK'" (click)="setPositionFilter('GK')">GK · Arqueros</button>
+      <button type="button" [class.active]="filterPosition() === 'DF'" (click)="setPositionFilter('DF')">DF · Defensores</button>
+      <button type="button" [class.active]="filterPosition() === 'MF'" (click)="setPositionFilter('MF')">MF · Mediocampistas</button>
+      <button type="button" [class.active]="filterPosition() === 'FW'" (click)="setPositionFilter('FW')">FW · Delanteros</button>
+    </div>
+  </div>
+
+  <!-- Grid de 3 columnas: Tu Plantel | Mesa de Negociación | Plantel Rival -->
+  <div class="market-grid">
+
+    <!-- COLUMNA 1: TU PLANTEL -->
+    <div class="squad-panel">
+      <div class="panel-header">
+        @if (myTeam(); as team) {
+          <div class="panel-team-title">
+            <img [src]="getTeamLogo(team.id)" (error)="handleMissingImage($event)" alt="Escudo" />
+            <div>
+              <h3>{{ team.name }}</h3>
+              <span class="panel-sub">Elegí el jugador a entregar</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="players-list-scroll">
+        @for (p of mySquad(); track p.id) {
+          <button
+            type="button"
+            class="market-player-card"
+            [class.selected]="selectedMyPlayer()?.id === p.id"
+            (click)="selectMyPlayer(p)">
+            <div class="mp-left">
+              <span class="pos-chip" [attr.data-pos]="p.position">{{ p.position }}</span>
+              <div class="mp-name-box">
+                <span class="mp-name">{{ p.name }}</span>
+                <span class="mp-role">{{ p.isStarter ? 'Titular' : 'Suplente' }} · ⚽ {{ p.stats.goals }}</span>
+              </div>
+            </div>
+            <div class="mp-rating">{{ p.rating }}</div>
+          </button>
+        } @empty {
+          <p class="empty-list">No hay jugadores en esta posición.</p>
+        }
+      </div>
+    </div>
+
+    <!-- COLUMNA 2: MESA DE NEGOCIACIÓN Y PROBABILIDAD -->
+    <div class="negotiation-center">
+      <div class="negotiation-card">
+        <h3 class="neg-title">Mesa de Negociación</h3>
+
+        <!-- Comparador de los 2 jugadores seleccionados -->
+        <div class="trade-slots">
+          <!-- Slot Jugador Ofrecido -->
+          <div class="trade-slot" [class.filled]="selectedMyPlayer()">
+            <span class="slot-label">ENTREGÁS A</span>
+            @if (selectedMyPlayer(); as myP) {
+              <div class="slot-player-info">
+                <div class="slot-ovr">{{ myP.rating }}</div>
+                <div class="slot-meta">
+                  <span class="slot-name">{{ myP.name }}</span>
+                  <span class="slot-pos">{{ myP.position }} · {{ myTeam()?.shortName }}</span>
+                </div>
+              </div>
+            } @else {
+              <div class="slot-placeholder">Seleccioná un jugador de tu equipo</div>
+            }
+          </div>
+
+          <div class="swap-arrows-divider">⇄</div>
+
+          <!-- Slot Jugador Solicitado -->
+          <div class="trade-slot" [class.filled]="selectedTargetPlayer()">
+            <span class="slot-label">RECIBÍS A</span>
+            @if (selectedTargetPlayer(); as targetP) {
+              <div class="slot-player-info">
+                <div class="slot-ovr target">{{ targetP.rating }}</div>
+                <div class="slot-meta">
+                  <span class="slot-name">{{ targetP.name }}</span>
+                  <span class="slot-pos">{{ targetP.position }} · {{ selectedRivalTeam()?.shortName }}</span>
+                </div>
+              </div>
+            } @else {
+              <div class="slot-placeholder">Seleccioná un jugador del club rival</div>
+            }
+          </div>
+        </div>
+
+        <!-- Medidor de Probabilidad -->
+        @if (tradeEvaluation(); as evalData) {
+          <div class="probability-box">
+            <div class="prob-header">
+              <span class="prob-label">Probabilidad de Éxito</span>
+              <span class="prob-difficulty" [attr.data-level]="evalData.badgeClass">
+                {{ evalData.difficultyLabel }}
+              </span>
+            </div>
+
+            <div class="prob-percentage-row">
+              <span class="prob-big-number" [attr.data-level]="evalData.badgeClass">
+                {{ evalData.probability }}%
+              </span>
+            </div>
+
+            <div class="prob-progress-track">
+              <div
+                class="prob-progress-fill"
+                [attr.data-level]="evalData.badgeClass"
+                [style.width.%]="evalData.probability">
+              </div>
+            </div>
+
+            <!-- Desglose de factores (sin edad) -->
+            <div class="factors-breakdown">
+              <div class="factor-item">
+                <span>Diferencia de Media:</span>
+                <strong [class.pos]="evalData.ratingDiff >= 0" [class.neg]="evalData.ratingDiff < 0">
+                  {{ evalData.ratingDiff > 0 ? '+' + evalData.ratingDiff : evalData.ratingDiff }} pts
+                </strong>
+              </div>
+              <div class="factor-item">
+                <span>Coincidencia de Posición:</span>
+                <strong [class.pos]="evalData.samePosition" [class.neg]="!evalData.samePosition">
+                  {{ evalData.samePosition ? 'Misma posición (+8%)' : 'Distinta posición (-8%)' }}
+                </strong>
+              </div>
+              <div class="factor-item">
+                <span>Rol en el Club Rival:</span>
+                <strong [class.pos]="!evalData.targetIsStarter" [class.neg]="evalData.targetIsStarter">
+                  {{ evalData.targetIsStarter ? 'Es Titular (-6%)' : 'Es Suplente (+4%)' }}
+                </strong>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="probability-empty">
+            Elegí un jugador de cada lado para calcular la probabilidad de aceptación del traspaso.
+          </div>
+        }
+
+        <!-- Alerta de validación táctica si aplica -->
+        @if (!tacticalValidation().valid) {
+          <div class="tactical-warning">
+            ⚠️ {{ tacticalValidation().reason }}
+          </div>
+        }
+
+        @if (attemptsLeft() === 0) {
+          <div class="tactical-warning depleted-msg">
+            🔒 Has agotado los 10 intentos de traspaso disponibles para esta partida.
+          </div>
+        }
+
+        <button
+          type="button"
+          class="btn-propose-trade"
+          [disabled]="!selectedMyPlayer() || !selectedTargetPlayer() || !tacticalValidation().valid || attemptsLeft() <= 0 || isSavingTrade()"
+          (click)="proposeTrade()">
+          @if (isSavingTrade()) {
+            Guardando en la partida...
+          } @else if (attemptsLeft() <= 0) {
+            Sin intentos disponibles (0/10)
+          } @else {
+            Proponer Intercambio (Usa 1 intento)
+          }
+        </button>
+      </div>
+
+      <!-- Historial de Intentos realizados en la partida -->
+      @if (transferHistory().length > 0) {
+        <div class="history-card">
+          <h4>Historial de Negociaciones ({{ transferHistory().length }}/10)</h4>
+          <div class="history-list">
+            @for (h of transferHistory(); track $index) {
+              <div class="history-item" [class.accepted]="h.accepted" [class.rejected]="!h.accepted">
+                <span class="h-status">{{ h.accepted ? '✅ Aceptado' : '❌ Rechazado' }}</span>
+                <span class="h-names">
+                  {{ h.myPlayerName }} ({{ h.myPlayerRating }}) ⇄ {{ h.targetPlayerName }} ({{ h.targetPlayerRating }})
+                </span>
+                <span class="h-prob">{{ h.probability }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- COLUMNA 3: CLUB RIVAL Y SU PLANTEL -->
+    <div class="squad-panel">
+      <div class="panel-header rival-selector-header">
+        <label class="select-club-label">Club con el que negociás:</label>
+        <div class="rival-select-row">
+          @if (selectedRivalTeam(); as rival) {
+            <img [src]="getTeamLogo(rival.id)" (error)="handleMissingImage($event)" alt="Escudo" />
+          }
+          <select
+            class="rival-team-select"
+            [ngModel]="selectedRivalTeamId()"
+            (ngModelChange)="selectRivalTeam($event)">
+            @for (t of rivalTeams(); track t.id) {
+              <option [ngValue]="t.id">{{ t.name }} ({{ t.shortName }})</option>
+            }
+          </select>
+        </div>
+
+        <input
+          type="text"
+          class="player-search-input"
+          placeholder="Buscar jugador por nombre..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)" />
+      </div>
+
+      <div class="players-list-scroll">
+        @for (p of rivalSquad(); track p.id) {
+          <button
+            type="button"
+            class="market-player-card"
+            [class.selected]="selectedTargetPlayer()?.id === p.id"
+            (click)="selectTargetPlayer(p)">
+            <div class="mp-left">
+              <span class="pos-chip" [attr.data-pos]="p.position">{{ p.position }}</span>
+              <div class="mp-name-box">
+                <span class="mp-name">{{ p.name }}</span>
+                <span class="mp-role">{{ p.isStarter ? 'Titular' : 'Suplente' }} · ⚽ {{ p.stats.goals }}</span>
+              </div>
+            </div>
+            <div class="mp-rating">{{ p.rating }}</div>
+          </button>
+        } @empty {
+          <p class="empty-list">No se encontraron jugadores con ese filtro.</p>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

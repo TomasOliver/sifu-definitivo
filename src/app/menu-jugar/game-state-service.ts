@@ -1,4 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { Teams } from '../models/teams';
 import { Match } from '../models/match';
 import { LeagueStanding } from '../models/league-standing';
@@ -6,7 +7,7 @@ import { MatchEvent } from '../models/match-event';
 import { Player } from '../models/player';
 import { TeamsService } from '../equipos/teams-service';
 import { SavesService } from '../lista-partidas-guardadas/saves-service';
-import { Saves } from '../models/saves';
+import { Saves, TransferHistoryEntry } from '../models/saves';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,8 @@ export class GameStateService {
   readonly teams = signal<Teams[]>([]);
   readonly fixture = signal<Match[]>([]);
   readonly standings = signal<LeagueStanding[]>([]);
+  readonly transferAttemptsLeft = signal<number>(10);
+  readonly transferHistory = signal<TransferHistoryEntry[]>([]);
   private simulationAuthorized = false;
 
   authorizeNextMatchSimulation() {
@@ -60,10 +63,13 @@ export class GameStateService {
     const saveCopy: Saves = JSON.parse(JSON.stringify(save));
     this.currentSave.set(saveCopy);
     localStorage.setItem('activeSaveId', String(saveCopy.id));
+    localStorage.setItem(`save_backup_${saveCopy.id}`, JSON.stringify(saveCopy));
 
     this.selectedTeamId.set(Number(saveCopy.teamId));
     this.teams.set(saveCopy.modifiedTeams);
     this.fixture.set(saveCopy.fixture);
+    this.transferAttemptsLeft.set(saveCopy.transferAttemptsLeft ?? 10);
+    this.transferHistory.set(saveCopy.transferHistory ?? []);
 
     if (saveCopy.standings && saveCopy.standings.length > 0) {
       this.standings.set(saveCopy.standings);
@@ -71,6 +77,18 @@ export class GameStateService {
       this.standings.set(this.createInitialStandings(saveCopy.modifiedTeams));
       this.recalculateStandings();
     }
+  }
+
+  // LIMPIAR ESTADO EN MEMORIA AL CERRAR SESIÓN
+  clearActiveGame() {
+    this.currentSave.set(null);
+    this.selectedTeamId.set(null);
+    this.teams.set([]);
+    this.fixture.set([]);
+    this.standings.set([]);
+    this.transferAttemptsLeft.set(10);
+    this.transferHistory.set([]);
+    localStorage.removeItem('activeSaveId');
   }
 
   // NUEVA PARTIDA
@@ -88,12 +106,14 @@ export class GameStateService {
     this.teams.set(data.teams);
     this.fixture.set(data.fixture);
     this.standings.set(this.createInitialStandings(data.teams));
+    this.transferAttemptsLeft.set(10);
+    this.transferHistory.set([]);
   }
 
-  // PERSISTIR EL PROGRESO EN LA BASE DE DATOS
-  persistCurrentSave() {
+  // PERSISTIR EL PROGRESO SOLO EN LA PARTIDA GUARDADA DEL USUARIO (NUNCA EN TEAMS GLOBAL)
+  persistCurrentSave(): Observable<Saves | null> {
     const current = this.currentSave();
-    if (!current) return;
+    if (!current) return of(null);
 
     const unplayed = this.fixture()
       .filter(m => !m.played)
@@ -101,18 +121,23 @@ export class GameStateService {
     const maxMatchday = this.fixture().reduce((max, m) => Math.max(max, m.matchday), 1);
     const nextMatchday = unplayed.length > 0 ? unplayed[0].matchday : maxMatchday;
 
-    const updatedSave: Saves = {
+    const updatedSave: Saves = JSON.parse(JSON.stringify({
       ...current,
       currentMatchday: nextMatchday,
       standings: this.standings(),
       modifiedTeams: this.teams(),
       fixture: this.fixture(),
+      transferAttemptsLeft: this.transferAttemptsLeft(),
+      transferHistory: this.transferHistory(),
       updatedAt: new Date().toISOString()
-    };
+    }));
 
     this.currentSave.set(updatedSave);
+    // Respaldo instantáneo local para no perder cambios si el usuario cierra sesión o recarga de inmediato
+    localStorage.setItem(`save_backup_${updatedSave.id}`, JSON.stringify(updatedSave));
 
-    this.savesService.updateSave(updatedSave).subscribe({
+    const save$ = this.savesService.updateSave(updatedSave);
+    save$.subscribe({
       next: (saved) => {
         console.log('Partida actualizada en DB:', saved.id);
       },
@@ -120,6 +145,8 @@ export class GameStateService {
         console.error('Error al actualizar la partida en DB:', err);
       }
     });
+
+    return save$;
   }
 
 
@@ -286,6 +313,76 @@ export class GameStateService {
 
     this.teams.set(newTeams);
     this.persistCurrentSave();
+  }
+
+  // EJECUTAR INTENTO DE INTERCAMBIO DE JUGADORES (SOLO EN LA PARTIDA GUARDADA ACTUAL)
+  executeTransferAttempt(params: {
+    myTeamId: number;
+    myPlayerId: number;
+    targetTeamId: number;
+    targetPlayerId: number;
+    probability: number;
+    accepted: boolean;
+  }): Observable<Saves | null> {
+    const remaining = Math.max(0, this.transferAttemptsLeft() - 1);
+    this.transferAttemptsLeft.set(remaining);
+
+    const myTeam = this.getTeamById(params.myTeamId);
+    const targetTeam = this.getTeamById(params.targetTeamId);
+    const myPlayer = myTeam?.squad.find(p => Number(p.id) === Number(params.myPlayerId));
+    const targetPlayer = targetTeam?.squad.find(p => Number(p.id) === Number(params.targetPlayerId));
+
+    if (myPlayer && targetPlayer && targetTeam) {
+      const entry: TransferHistoryEntry = {
+        myPlayerName: myPlayer.name,
+        myPlayerRating: myPlayer.rating,
+        myPlayerPosition: myPlayer.position ?? 'MF',
+        targetPlayerName: targetPlayer.name,
+        targetPlayerRating: targetPlayer.rating,
+        targetPlayerPosition: targetPlayer.position ?? 'MF',
+        targetTeamId: targetTeam.id,
+        targetTeamName: targetTeam.name,
+        probability: params.probability,
+        accepted: params.accepted,
+        timestamp: new Date().toISOString()
+      };
+      this.transferHistory.set([entry, ...this.transferHistory()]);
+    }
+
+    if (params.accepted && myTeam && targetTeam && myPlayer && targetPlayer) {
+      const myPlayerWasStarter = myPlayer.isStarter;
+      const targetPlayerWasStarter = targetPlayer.isStarter;
+
+      const incomingToMyTeam: Player = {
+        ...targetPlayer,
+        isStarter: myPlayerWasStarter
+      };
+
+      const outgoingToTargetTeam: Player = {
+        ...myPlayer,
+        isStarter: targetPlayerWasStarter
+      };
+
+      const updatedTeams = this.teams().map(t => {
+        if (Number(t.id) === Number(params.myTeamId)) {
+          return {
+            ...t,
+            squad: t.squad.map(p => Number(p.id) === Number(params.myPlayerId) ? incomingToMyTeam : p)
+          };
+        }
+        if (Number(t.id) === Number(params.targetTeamId)) {
+          return {
+            ...t,
+            squad: t.squad.map(p => Number(p.id) === Number(params.targetPlayerId) ? outgoingToTargetTeam : p)
+          };
+        }
+        return t;
+      });
+
+      this.teams.set(updatedTeams);
+    }
+
+    return this.persistCurrentSave();
   }
 
 }
