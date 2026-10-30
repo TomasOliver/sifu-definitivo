@@ -137,7 +137,7 @@ export class PlantillaComponent {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
 
   private ordenarPorPosicion(jugadores: Player[]) {

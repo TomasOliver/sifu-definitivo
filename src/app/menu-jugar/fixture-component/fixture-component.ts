@@ -4,7 +4,7 @@ import { GameStateService } from '../../menu-jugar/game-state-service';
 import { Match } from '../../models/match';
 import { MatchEvent } from '../../models/match-event';
 import { Teams } from '../../models/teams';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-fixture',
@@ -15,6 +15,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 })
 export class FixtureComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   // sacamos el ID del equipo de la url
   protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
   private readonly location = inject(Location);
@@ -47,7 +48,7 @@ export class FixtureComponent {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
 
   // acceso directo al fixture

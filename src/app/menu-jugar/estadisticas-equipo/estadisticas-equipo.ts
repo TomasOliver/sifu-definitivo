@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { GameStateService } from '../game-state-service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
 
 @Component({
@@ -12,12 +12,13 @@ import { Location } from '@angular/common';
 export class EstadisticasEquipo {
 
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
   private readonly location = inject(Location);
   private readonly gameState = inject(GameStateService);
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
 
   team = computed(() => {

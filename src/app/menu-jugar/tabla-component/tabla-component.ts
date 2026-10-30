@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { GameStateService } from '../../menu-jugar/game-state-service';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Teams } from '../../models/teams';
 import { Player } from '../../models/player';
 import { LeagueStanding } from '../../models/league-standing';
@@ -17,6 +17,7 @@ export class TablaComponent {
 
   private readonly gameState = inject(GameStateService);
   private readonly location = inject(Location);
+  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly teamId = Number(this.route.snapshot.paramMap.get('id'));
 
@@ -145,6 +146,6 @@ export class TablaComponent {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
 }

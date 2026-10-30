@@ -48,7 +48,7 @@ export class MenuSimulacion {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/inicio', this.teamId]);
   }
   navigateToSimulacionPartido(id: number) {
     this.gameState.authorizeNextMatchSimulation();
